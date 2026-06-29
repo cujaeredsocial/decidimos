@@ -69,7 +69,7 @@ end
     :user_name      => Decidim::Env.new("SMTP_USERNAME").to_s,
     :password       => Decidim::Env.new("SMTP_PASSWORD").to_s,
     :domain         => Decidim::Env.new("SMTP_DOMAIN").to_s,
-    :enable_starttls_auto => Decidim::Env.new("SMTP_STARTTLS_AUTO").to_boolean_string,
+    :enable_starttls_auto => Decidim::Env.new("SMTP_STARTTLS_AUTO", true).present?,
     :openssl_verify_mode => 'none'
   }
 
@@ -82,8 +82,8 @@ end
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  # config.active_job.queue_adapter = :resque
-  # config.active_job.queue_name_prefix = "decidim_cujae_production"
+  config.active_job.queue_adapter = ENV['QUEUE_ADAPTER'] if ENV['QUEUE_ADAPTER'].present?
+  # config.active_job.queue_name_prefix = "code_production"
 
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.

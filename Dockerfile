@@ -16,20 +16,26 @@ RUN npm install -g yarn
 
 WORKDIR /app
 
+COPY package.json package-lock.json .
+
+RUN yarn install
+
 COPY Gemfile Gemfile.lock* ./
 
-RUN bundle install --without development test --jobs 4 --retry 3
+# RUN bundle install --without development test --jobs 4 --retry 3
+RUN bundle install
 
 COPY . .
 
-RUN RAILS_ENV=production bundle exec rake assets:precompile
+# RUN RAILS_ENV=production bundle exec rake assets:precompile
+RUN bundle exec rake assets:precompile
 
 RUN rm -rf /app/tmp/cache /app/public/assets/.sprockets-manifest-* \
     && rm -rf /usr/local/bundle/cache/*.gem
 
-ENV RAILS_ENV=production \
-    RAILS_SERVE_STATIC_FILES=true \
-    RAILS_LOG_TO_STDOUT=true
+# ENV RAILS_ENV=production \
+#   RAILS_SERVE_STATIC_FILES=true \
+#    RAILS_LOG_TO_STDOUT=true
 
 EXPOSE 3000
 

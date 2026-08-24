@@ -1,11 +1,15 @@
 {
-  "name": "decidim-development-app",
   "private": true,
   "dependencies": {
     "@decidim/browserslist-config": "^0.31.5",
     "@decidim/core": "^0.31.5",
-    "@decidim/webpacker": "^0.31.5"
+    "@decidim/webpacker": "^0.31.5",
+    "graphql": "^16.0.0"
   },
+  "resolutions": {
+    "uc.micro": "^2.0.0"
+  },
+  "packageManager": "yarn@1.22.22",
   "version": "0.1.0",
   "devDependencies": {
     "@decidim/dev": "^0.31.5",

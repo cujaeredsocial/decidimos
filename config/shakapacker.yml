@@ -33,7 +33,7 @@ default: &default
   # Select whether the compiler will always use a content hash and not just in production
   # Do not use contentHash except for production for performance
   # https://webpack.js.org/guides/build-performance/#avoid-production-specific-tooling
-  useContentHash: false
+  useContentHash: true
 
 development:
   <<: *default

@@ -1,0 +1,11 @@
+es:
+  activemodel:
+    attributes:
+      ci_authorization_handler:
+        document_number: Número de carné de identidad
+  decidim:
+    authorization_handlers:
+      ci_authorization_handler:
+        name: Carné de identidad
+        explanation: Verifícate con el número de tu carné de identidad.
+        help_text: Los 11 dígitos de tu carné, sin espacios. No guardamos el número, solo comprobamos que no se use en otra cuenta.

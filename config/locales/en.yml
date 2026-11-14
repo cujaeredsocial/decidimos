@@ -29,3 +29,13 @@
 
 en:
   hello: "Hello world"
+  activemodel:
+    attributes:
+      ci_authorization_handler:
+        document_number: Identity card number
+  decidim:
+    authorization_handlers:
+      ci_authorization_handler:
+        name: Identity card
+        explanation: Get verified with your Cuban identity card number.
+        help_text: The 11 digits of your identity card, without spaces. We do not store the number, we only check it is not used by another account.

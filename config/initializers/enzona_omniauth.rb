@@ -83,3 +83,20 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       setup: setup_provider_proc(:xetid, client_id: :client_id, client_secret: :client_secret)
   end
 end
+
+# enzona icon hardcoded 
+module XetidOauthIcon
+  def oauth_icon(provider)
+    if provider.to_sym == :xetid
+      org_path = current_organization.enabled_omniauth_providers.dig(:xetid, :icon_path)
+      path = org_path.presence || Decidim.omniauth_providers.dig(:xetid, :icon_path)
+      return external_icon(path) if path.present?
+    end
+
+    super
+  end
+end
+
+Rails.application.config.to_prepare do
+  Decidim::OmniauthHelper.prepend(XetidOauthIcon) unless Decidim::OmniauthHelper < XetidOauthIcon
+end

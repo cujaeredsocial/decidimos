@@ -1,0 +1,53 @@
+services:
+  app:
+    image: decidim/decidim:0.31.5
+    volumes:
+      - .:/code
+      - bundle:/usr/local/bundle
+      - node_modules:/code/node_modules
+    environment:
+      - PORT=3000
+      - DATABASE_HOST=pg
+      - RAILS_ENV=development
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - REDIS_URL=redis://redis:6379/1
+    ports:
+      - 3000:3000
+    links:
+      - pg
+      - redis
+    command: bundle exec puma
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis-data:/data
+  
+  pg:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-admin@admin.org}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - 5050:80
+    depends_on:
+      - pg
+
+volumes:
+  node_modules: {}
+  bundle: {}
+  pg-data: {}
+  redis-data: {}
+  pgadmin-data: {}

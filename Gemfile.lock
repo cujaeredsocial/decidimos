@@ -892,6 +892,7 @@ DEPENDENCIES
   listen (~> 3.1)
   net-imap (~> 0.5.0)
   net-pop (~> 0.1.1)
+  omniauth-oauth2
   puma (>= 6.3.1)
   sidekiq
   web-console (~> 4.2)

@@ -4,6 +4,32 @@ Free Open-Source participatory democracy, citizen participation and open governm
 
 This is the open-source repository for decidim_cujae, based on [Decidim](https://github.com/decidim/decidim).
 
+## Develop
+
+```sh
+docker compose -f docker-compose.dev.yml up -d
+```
+
+- App: http://localhost:3000
+- pgAdmin: http://localhost:5050
+
+Setup dev database
+
+```sh
+docker compose -f docker-compose.dev.yml exec app bin/rails db:create db:migrate assets:precompile db:seed
+```
+
+## Production
+
+1. Review `.env` (database credentials and other variables).
+2. Start the services:
+
+```
+docker compose up -d
+```
+
+The app listens on port 3000. Postgres data and storage live in `/srv/decidimos/`.
+
 ## Setting up the application
 
 You will need to do some steps before having the app working properly once you have deployed it:

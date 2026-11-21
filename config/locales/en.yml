@@ -29,3 +29,10 @@
 
 en:
   hello: "Hello world"
+  decidim:
+    system:
+      organizations:
+        omniauth_settings:
+          xetid:
+            client_id: Client ID
+            client_secret: Client secret

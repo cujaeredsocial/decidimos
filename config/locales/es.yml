@@ -1,0 +1,8 @@
+es:
+  decidim:
+    system:
+      organizations:
+        omniauth_settings:
+          xetid:
+            client_id: ID de cliente
+            client_secret: Secreto de cliente

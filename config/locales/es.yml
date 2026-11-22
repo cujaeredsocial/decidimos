@@ -1,4 +1,9 @@
 es:
+  devise:
+    failure:
+      unconfirmed: Espere hasta que su cuenta sea verificada, por favor contacta a soporte en caso de una demora muy prolongada.
+    registrations:
+      signed_up_but_unconfirmed: Espere hasta que su cuenta sea verificada, por favor contacta a soporte en caso de una demora muy prolongada.
   decidim:
     system:
       organizations:
@@ -6,3 +11,23 @@ es:
           xetid:
             client_id: ID de cliente
             client_secret: Secreto de cliente
+    admin:
+      menu:
+        user_confirmations: Verificación de cuentas
+      user_confirmations:
+        index:
+          actions: Acciones
+          confirm: Verificar
+          confirm_question: "¿Verificar la cuenta de %{name}? Podrá iniciar sesión de inmediato."
+          created_at: Fecha de registro
+          description: Participantes registrados que aún no han verificado su cuenta. Una vez verificados pueden iniciar sesión.
+          empty: No hay cuentas pendientes de verificación.
+          name: Nombre
+          nickname: Alias
+          search_placeholder: Buscar por nombre, alias o correo electrónico
+          title: Verificación de cuentas
+        update:
+          success: La cuenta de %{name} ha sido verificada.
+    admin_log:
+      user:
+        confirm: "%{user_name} verificó la cuenta de la participante %{resource_name}"

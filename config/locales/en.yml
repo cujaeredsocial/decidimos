@@ -29,6 +29,12 @@
 
 en:
   hello: "Hello world"
+    
+  devise:
+    failure:
+      unconfirmed: Please wait until your account is verified. Contact support if it takes too long.
+    registrations:
+      signed_up_but_unconfirmed: Please wait until your account is verified. Contact support if it takes too long.
   decidim:
     system:
       organizations:
@@ -36,3 +42,23 @@ en:
           xetid:
             client_id: Client ID
             client_secret: Client secret
+    admin:
+      menu:
+        user_confirmations: Account verification
+      user_confirmations:
+        index:
+          actions: Actions
+          confirm: Verify
+          confirm_question: "Verify the account of %{name}? They will be able to sign in right away."
+          created_at: Registered at
+          description: Registered participants whose account is not verified yet. Once verified they can sign in.
+          empty: There are no accounts pending verification.
+          name: Name
+          nickname: Nickname
+          search_placeholder: Search by name, nickname or email
+          title: Account verification
+        update:
+          success: The account of %{name} has been verified.
+    admin_log:
+      user:
+        confirm: "%{user_name} verified the account of participant %{resource_name}"

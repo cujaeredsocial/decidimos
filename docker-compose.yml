@@ -12,6 +12,24 @@ services:
       - "3000:3000"
     depends_on:
       - pg
+      - pgweb
+    restart: unless-stopped
+
+  pgweb:
+    image: sosedoff/pgweb:0.16.2
+    container_name: pgweb-cujae
+    command:
+      - pgweb
+      - --bind=0.0.0.0
+      - --listen=8081
+      - --prefix=db-admin
+      - --skip-open
+      - --lock-session
+      - --url=postgres://postgres:${DATABASE_PASSWORD:-postgres}@pg:5432/decidim?sslmode=disable
+      - --auth-user=${DB_ADMIN_USER:?set DB_ADMIN_USER in .env}
+      - --auth-pass=${DB_ADMIN_PASSWORD:?set DB_ADMIN_PASSWORD in .env}
+    depends_on:
+      - pg
     restart: unless-stopped
   pg:
     image: postgres:14.5

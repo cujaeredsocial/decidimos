@@ -1,6 +1,8 @@
 services:
   app:
-    image: decidim/decidim:0.31.5
+    build:
+      context: .            
+      dockerfile: Dockerfile
     volumes:
       - .:/code
       - bundle:/usr/local/bundle
@@ -12,11 +14,15 @@ services:
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=postgres
       - REDIS_URL=redis://redis:6379/1
+      - DB_ADMIN_URL=http://pgweb:8081
+      - DB_ADMIN_USER=${DB_ADMIN_USER:-dbadmin}
+      - DB_ADMIN_PASSWORD=${DB_ADMIN_PASSWORD:-dbadmin}
     ports:
       - 3000:3000
     links:
       - pg
       - redis
+      - pgweb
     command: bundle exec puma
 
   redis:
@@ -32,16 +38,19 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-admin@admin.org}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
-      - PGADMIN_CONFIG_SERVER_MODE=False
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    ports:
-      - 5050:80
+  # DB admin UI served by the app at /db-admin (no published port on purpose)
+  pgweb:
+    image: sosedoff/pgweb:0.16.2
+    command:
+      - pgweb
+      - --bind=0.0.0.0
+      - --listen=8081
+      - --prefix=db-admin
+      - --skip-open
+      - --lock-session
+      - --url=postgres://postgres:${DATABASE_PASSWORD:-postgres}@pg:5432/decidim_cujae_development?sslmode=disable
+      - --auth-user=${DB_ADMIN_USER:-dbadmin}
+      - --auth-pass=${DB_ADMIN_PASSWORD:-dbadmin}
     depends_on:
       - pg
 

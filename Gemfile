@@ -18,6 +18,7 @@ gem "bootsnap", "~> 1.3"
 
 gem "puma", ">= 6.3.1"
 gem "omniauth-oauth2"
+gem "rack-proxy", "~> 0.7"
 
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri

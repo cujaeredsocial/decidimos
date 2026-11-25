@@ -1,33 +1,84 @@
 es:
   devise:
     failure:
-      unconfirmed: Espere hasta que su cuenta sea verificada, por favor contacta a soporte en caso de una demora muy prolongada.
+      unconfirmed: Espere hasta que su cuenta sea confirmada, por favor contacta a soporte en caso de una demora muy prolongada.
     registrations:
-      signed_up_but_unconfirmed: Espere hasta que su cuenta sea verificada, por favor contacta a soporte en caso de una demora muy prolongada.
+      signed_up_but_unconfirmed: Espere hasta que su cuenta sea confirmada, por favor contacta a soporte en caso de una demora muy prolongada.
   decidim:
-    system:
-      organizations:
-        omniauth_settings:
-          xetid:
-            client_id: ID de cliente
-            client_secret: Secreto de cliente
+    authorization_handlers:
+      verified_account:
+        name: Cuenta verificada
+        explanation: Demuestra que eres una persona real iniciando sesión en EnZona, o pide a un administrador que te verifique.
     admin:
       menu:
-        user_confirmations: Verificación de cuentas
+        user_confirmations: Confirmación de cuentas
+        user_verifications: Verificación de cuentas
       user_confirmations:
         index:
           actions: Acciones
-          confirm: Verificar
-          confirm_question: "¿Verificar la cuenta de %{name}? Podrá iniciar sesión de inmediato."
+          confirm: Confirmar
+          confirm_question: "¿Confirmar la cuenta de %{name}? Podrá iniciar sesión de inmediato."
           created_at: Fecha de registro
-          description: Participantes registrados que aún no han verificado su cuenta. Una vez verificados pueden iniciar sesión.
-          empty: No hay cuentas pendientes de verificación.
+          description: Participantes registrados cuya cuenta aún no ha sido confirmada. Una vez confirmados pueden iniciar sesión. Confirmar una cuenta no verifica la identidad de la persona.
+          empty: No hay cuentas pendientes de confirmación.
           name: Nombre
           nickname: Alias
           search_placeholder: Buscar por nombre, alias o correo electrónico
+          title: Confirmación de cuentas
+        update:
+          success: La cuenta de %{name} ha sido confirmada.
+      user_verifications:
+        index:
+          actions: Acciones
+          description: Verifica que un participante confirmado es una persona real. Los participantes también pueden verificarse ellos mismos iniciando sesión en EnZona desde Mi cuenta > Autorizaciones.
+          empty:
+            pending: No hay cuentas confirmadas pendientes de verificación.
+            verified: No hay cuentas verificadas.
+          methods:
+            enzona: Verificada con EnZona
+            manual: Verificada por un administrador
+          name: Nombre
+          nickname: Alias
+          not_verified: Sin verificar
+          revoke: Revocar
+          revoke_question: "¿Revocar la verificación de %{name}? Perderá el acceso a las acciones que requieren una cuenta verificada."
+          search_placeholder: Buscar por nombre, alias o correo electrónico
+          states:
+            pending: Sin verificar
+            verified: Verificadas
+          status: Estado
           title: Verificación de cuentas
+          verify: Verificar
+          verify_question: "¿Verificar que %{name} es una persona real?"
+        destroy:
+          success: Se ha revocado la verificación de %{name}.
         update:
           success: La cuenta de %{name} ha sido verificada.
     admin_log:
       user:
-        confirm: "%{user_name} verificó la cuenta de la participante %{resource_name}"
+        confirm: "%{user_name} confirmó la cuenta de la participante %{resource_name}"
+        unverify: "%{user_name} revocó la verificación de la participante %{resource_name}"
+        verify: "%{user_name} verificó la identidad de la participante %{resource_name}"
+  decidim_cujae:
+    verified_account:
+      authorizations:
+        errors:
+          already_used: Esta identidad de EnZona ya verifica otra cuenta.
+          cancelled: Se canceló el inicio de sesión en EnZona.
+          error: EnZona no pudo verificar tu identidad. Inténtalo de nuevo más tarde.
+          invalid_state: El inicio de sesión en EnZona caducó o no es válido. Inténtalo de nuevo.
+          not_configured: La verificación con EnZona no está disponible en este momento.
+        new:
+          description: Una cuenta verificada demuestra que eres una persona real. Algunas acciones de la plataforma la requieren.
+          enzona_button: Verificar con EnZona
+          enzona_help: Tu identidad de EnZona solo puede verificar una cuenta.
+          enzona_title: Con EnZona
+          enzona_unavailable: La verificación con EnZona no está disponible en este momento.
+          manual_help: Si no tienes EnZona, contacta con un administrador de la plataforma para que verifique tu identidad.
+          manual_title: Por un administrador
+          steps:
+            back: Vuelves aquí y tu cuenta queda verificada al momento.
+            sign_in: Inicia sesión en EnZona con tu cuenta habitual y acepta compartir tu identidad con esta plataforma.
+            start: Pulsa "Verificar con EnZona".
+          title: Verifica tu cuenta
+        success: Tu cuenta ha sido verificada con EnZona.

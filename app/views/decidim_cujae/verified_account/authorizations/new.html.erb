@@ -1,0 +1,55 @@
+<% scope = "decidim_cujae.verified_account.authorizations.new" %>
+<% enzona_logo = DecidimCujae::VerifiedAccount::ENZONA_ICON %>
+
+<div class="text-center py-10">
+  <h1 class="title-decorator inline-block text-left">
+    <%= t("title", scope:) %>
+  </h1>
+</div>
+
+<div class="form__wrapper">
+  <div class="flex items-start gap-4">
+    <%= image_pack_tag enzona_logo, alt: "EnZona", class: "w-14 h-14 flex-none", style: "object-fit: contain" %>
+    <p><%= t("description", scope:) %></p>
+  </div>
+
+  <section class="mt-6">
+    <h2 class="h4 flex items-center gap-2">
+      <%= image_pack_tag enzona_logo, alt: "", class: "w-6 h-6", style: "object-fit: contain" %>
+      <%= t("enzona_title", scope:) %>
+    </h2>
+
+    <% if enzona_configured? %>
+      <ol class="list-decimal ml-6 my-4 space-y-2">
+        <li><%= t("steps.start", scope:) %></li>
+        <li><%= t("steps.sign_in", scope:) %></li>
+        <li><%= t("steps.back", scope:) %></li>
+      </ol>
+      <p class="text-sm text-gray-2 mb-4"><%= t("enzona_help", scope:) %></p>
+
+      <%= link_to enzona_authorization_path(redirect_url:),
+                  class: "button button__sm md:button__lg button__secondary",
+                  data: { turbo: false } do %>
+        <%= image_pack_tag enzona_logo, alt: "", class: "w-6 h-6", style: "object-fit: contain" %>
+        <span><%= t("enzona_button", scope:) %></span>
+      <% end %>
+    <% else %>
+      <p class="mt-2"><%= t("enzona_unavailable", scope:) %></p>
+    <% end %>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="h4 flex items-center gap-2">
+      <%= icon "user-follow-line", class: "w-6 h-6 fill-current text-secondary" %>
+      <%= t("manual_title", scope:) %>
+    </h2>
+    <p class="mt-2"><%= t("manual_help", scope:) %></p>
+  </section>
+</div>
+
+<div class="form__wrapper-block flex-col-reverse md:flex-row justify-between">
+  <%= link_to authorizations_back_path(current_user, redirect_url:), class: "button button__sm md:button__lg button__text-secondary" do %>
+    <%= icon "arrow-left-line", class: "fill-current" %>
+    <%= t("decidim.wizard_step_form.wizard_aside.back") %>
+  <% end %>
+</div>

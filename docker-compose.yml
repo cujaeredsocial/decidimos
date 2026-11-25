@@ -3,6 +3,11 @@ services:
   app:
     image: decidim/decidim:0.31.5
     container_name: decidim-cujae
+    working_dir: /app
+    entrypoint: ["/app/bin/docker-entrypoint"]
+    command: ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+    environment:
+      - BOOT_SETUP=1
     volumes:
       - .:/app
       - /srv/decidimos/decidim-storage:/app/storage

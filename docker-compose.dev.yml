@@ -1,13 +1,14 @@
 services:
   app:
-    build:
-      context: .            
-      dockerfile: Dockerfile
+    image: decidim/decidim:0.31.5
+    working_dir: /code
+    entrypoint: ["/code/bin/docker-entrypoint"]
     volumes:
       - .:/code
       - bundle:/usr/local/bundle
       - node_modules:/code/node_modules
     environment:
+      - BOOT_SETUP=1
       - PORT=3000
       - DATABASE_HOST=pg
       - RAILS_ENV=development
@@ -45,7 +46,7 @@ services:
       - pgweb
       - --bind=0.0.0.0
       - --listen=8081
-      - --prefix=db-admin
+      - --prefix=pgweb
       - --skip-open
       - --lock-session
       - --url=postgres://postgres:${DATABASE_PASSWORD:-postgres}@pg:5432/decidim_cujae_development?sslmode=disable

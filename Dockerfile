@@ -31,6 +31,8 @@ RUN bundle exec rake assets:precompile
 RUN rm -rf /app/tmp/cache /app/public/assets/.sprockets-manifest-* \
     && rm -rf /usr/local/bundle/cache/*.gem
 
+ENV BOOT_SETUP=0
+
 EXPOSE 3000
 
 ENTRYPOINT ["/app/bin/docker-entrypoint"]

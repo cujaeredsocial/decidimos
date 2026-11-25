@@ -1,75 +1,88 @@
 # decidimos
 
-Free Open-Source participatory democracy, citizen participation and open government for cities and organizations
+Plataforma de participación ciudadana orientada al entorno cubano, basada en [Decidim](https://github.com/decidim/decidim) 0.31: democracia participativa y gobierno abierto, de código abierto.
 
-This is the open-source repository for decidim_cujae, based on [Decidim](https://github.com/decidim/decidim).
+## Desarrollo
 
-## Develop
+Levantar el entorno (app, PostgreSQL, Redis y pgweb):
 
 ```sh
 docker compose -f docker-compose.dev.yml up -d
 ```
 
-- App: http://localhost:3000
-- pgAdmin: http://localhost:5050
-
-Setup dev database
+Crear la base de datos la primera vez:
 
 ```sh
-docker compose -f docker-compose.dev.yml exec app bin/rails db:create db:migrate assets:precompile db:seed
+docker compose -f docker-compose.dev.yml exec app bundle exec rails db:create db:migrate db:seed assets:precompile
 ```
 
-## Production
+- App: http://localhost:3000
+- pgweb: http://localhost:3000/pgweb, solo para administradores con sesión iniciada.
+- Los usuarios de prueba que crea `db:seed` tienen la contraseña `decidim123456789`.
 
-1. Review `.env` (database credentials and other variables).
-2. Start the services:
+Usa siempre `docker-compose.dev.yml` en desarrollo. `docker-compose.yml` es el de producción.
 
-```
-docker compose up -d
-```
+## Producción
 
-The app listens on port 3000. Postgres data and storage live in `/srv/decidimos/`.
+Se despliega de dos formas:
 
-### EnZona environment variables
+- **CapRover** (`captain-definition`): construye la imagen con el `Dockerfile`, que instala las gemas y compila los assets.
+- **Docker Compose** (`docker-compose.yml`): usa la imagen `decidim/decidim:0.31.5` con el código montado. Tras actualizar el código hay que ejecutar `bundle install` y `bundle exec rails assets:precompile` dentro del contenedor.
 
-EnZona is not a sign-in method. It is used to verify that a participant is a real person (the "Verified account" authorization, see `lib/decidim_cujae/verified_account.rb`). Its OAuth2 credentials are read from the environment, not from `/system`:
+Con Docker Compose:
 
-| Variable | Required | Value |
+1. Revisa el `.env` (variables abajo).
+2. Levanta los servicios:
+
+   ```sh
+   docker compose up -d
+   ```
+
+La app escucha en el puerto 3000. Los datos de PostgreSQL y los archivos subidos están en `/srv/decidimos/`.
+
+### Variables de entorno
+
+Van en el `.env`, o en las variables de entorno de la app si se usa CapRover. Reinicia la app después de cambiarlas.
+
+| Variable | Obligatoria | Para qué |
 | --- | --- | --- |
-| `ENZONA_CLIENT_ID` | Yes | Client ID of the EnZona (XETID) OAuth application |
-| `ENZONA_CLIENT_SECRET` | Yes | Client secret of that application |
-| `ENZONA_SITE` | No | EnZona identity server. Default `https://identity.enzona.net` |
-| `ENZONA_SSL_VERIFY` | No | `true` to verify EnZona's TLS certificate. Default: not verified |
+| `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `DATABASE_URL` | Sí | Conexión a PostgreSQL |
+| `DB_ADMIN_USER`, `DB_ADMIN_PASSWORD` | Sí con Docker Compose | Usuario y contraseña de pgweb |
+| `ENZONA_CLIENT_ID` | Sí, para verificar con EnZona | Client ID de la aplicación OAuth de EnZona (XETID) |
+| `ENZONA_CLIENT_SECRET` | Sí, para verificar con EnZona | Client secret de esa aplicación |
+| `ENZONA_SITE` | No | Servidor de identidad de EnZona. Por defecto `https://identity.enzona.net` |
+| `ENZONA_SSL_VERIFY` | No | `true` para verificar el certificado TLS de EnZona. Por defecto no se verifica |
+| `ENZONA_CALLBACK_PATH` | No | URL de retorno que se envía a EnZona: `/users/auth/xetid/callback` (por defecto) o `/verified_account/authorization/callback` |
 
-Set them in `.env` (or in the app's environment variables in CapRover). Without `ENZONA_CLIENT_ID` and `ENZONA_CLIENT_SECRET` the app still boots, but verification with EnZona shows as unavailable and only manual verification by admins works.
+### EnZona
 
-The EnZona OAuth application must have this redirect URI registered:
+EnZona se usa como alternativa para verificar que un participante es una persona real (`lib/decidim_cujae/verified_account.rb`).
+Una cuenta se verifica de dos formas:
 
-```
-https://<your host>/verified_account/authorization/callback
-```
+- El participante inicia sesión en EnZona desde *Mi cuenta → Autorizaciones*. Una identidad de EnZona solo puede verificar una cuenta.
+- Un administrador lo verifica a mano en *Admin → Participantes → Verificación de cuentas*.
 
-Restart the app after changing these variables.
+#### Actualizar desde la versión con login por EnZona
 
-#### Upgrading from the EnZona sign-in version
-
-Older versions used EnZona (`xetid`) as a sign-in provider configured in `/system`. After deploying this version, run once (back up the database first):
+Las versiones anteriores usaban EnZona (`xetid`) para iniciar sesión, configurado en `/system`. Tras desplegar esta versión, haz una copia de la base de datos y ejecuta una sola vez:
 
 ```sh
 bundle exec rails decidim_cujae:verified_account:migrate_from_enzona_login
 ```
 
-It removes the old `xetid` sign-in settings from every organization (otherwise the sign-in page shows a broken EnZona button), enables the "Verified account" authorization, and turns every existing EnZona identity into a verified account. The old redirect URI `/users/auth/xetid/callback` is no longer used.
+## Puesta en marcha
 
-## Setting up the application
+Después del primer despliegue:
 
-You will need to do some steps before having the app working properly once you have deployed it:
+1. Crea un administrador del sistema: `bundle exec rails decidim_system:create_admin`.
+2. Entra en `<url de la app>/system` con esas credenciales.
+3. Crea una organización. Elige sus idiomas y el idioma por defecto.
+4. Pon el host correcto de la organización, incluido el subdominio si lo hay. Si no coincide, la app no funciona.
+5. En "Autorizaciones disponibles", marca "Cuenta verificada (Con varios pasos)".
+6. Completa el resto del formulario y guárdalo.
+7. En los permisos de cada componente, exige "Cuenta verificada" en las acciones que deban hacer solo personas verificadas.
 
-1. Create a System Admin user: `bin/rails decidim_system:create_admin`
-1. Visit `<your app url>/system` and log in with your system admin credentials
-1. Create a new organization. Check the locales you want to use for that organization, and select a default locale.
-1. Set the correct default host for the organization, otherwise the app will not work properly. Note that you need to include any subdomain you might be using.
-1. Fill the rest of the form and submit it.
-1. Edit the organization in `/system` and, under "Available authorizations", check "Verified account (Multi-Step)". Then, in each component's Permissions, require it for the actions that need a real, verified person. See [EnZona environment variables](#enzona-environment-variables).
+## Cuentas de usuario
 
-You are good to go!
+- **Confirmación:** un administrador puede confirmar a mano las cuentas nuevas en *Admin → Participantes → Confirmación de cuentas*.
+- **Verificación:** confirmar una cuenta no verifica la identidad de la persona. La verificación es un paso aparte (ver [EnZona](#enzona)).

@@ -27,10 +27,11 @@ module DecidimCujae
         return fail_with(:not_configured) unless enzona_configured?
 
         state = SecureRandom.urlsafe_base64(32)
-        session[SESSION_KEY] = { "state" => state, "redirect_url" => redirect_url }
+        redirect_uri = DecidimCujae::Enzona.redirect_uri(request.base_url)
+        # The token exchange must send the same redirect_uri as this request.
+        session[SESSION_KEY] = { "state" => state, "redirect_url" => redirect_url, "redirect_uri" => redirect_uri }
 
-        redirect_to DecidimCujae::Enzona.authorize_url(redirect_uri: callback_authorization_url, state:),
-                    allow_other_host: true
+        redirect_to DecidimCujae::Enzona.authorize_url(redirect_uri:, state:), allow_other_host: true
       end
 
       def callback
@@ -42,7 +43,8 @@ module DecidimCujae
         return fail_with(:invalid_state) unless valid_state?(stored["state"])
         return fail_with(:cancelled) if params[:error].present? || params[:code].blank?
 
-        uid = DecidimCujae::Enzona.fetch_uid(params[:code], redirect_uri: callback_authorization_url)
+        redirect_uri = stored["redirect_uri"].presence || DecidimCujae::Enzona.redirect_uri(request.base_url)
+        uid = DecidimCujae::Enzona.fetch_uid(params[:code], redirect_uri:)
         return fail_with(:error) if uid.blank?
 
         # Decidim::Command instance_evals this block: use locals, not ivars.

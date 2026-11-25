@@ -12,13 +12,31 @@ module DecidimCujae
   #   ENZONA_CLIENT_ID, ENZONA_CLIENT_SECRET   required
   #   ENZONA_SITE                              default https://identity.enzona.net
   #   ENZONA_SSL_VERIFY                        "true" to verify the TLS cert (default "false")
+  #   ENZONA_CALLBACK_PATH                     redirect URI path sent to EnZona, one of
+  #                                            CALLBACK_PATHS (default LEGACY_CALLBACK_PATH)
+  #
+  # Both callback paths work: the legacy one (the URI registered in EnZona
+  # when it was a sign-in provider) redirects to the new one, see
+  # config/routes.rb. ENZONA_CALLBACK_PATH only picks which one is sent as
+  # redirect_uri, which must match a URI registered in EnZona.
   module Enzona
     SCOPE = "openid web-enzona"
+    LEGACY_CALLBACK_PATH = "/users/auth/xetid/callback"
+    CALLBACK_PATH = "/verified_account/authorization/callback"
+    CALLBACK_PATHS = [LEGACY_CALLBACK_PATH, CALLBACK_PATH].freeze
 
     module_function
 
     def configured?
       client_id.present? && client_secret.present?
+    end
+
+    # Full redirect URI to send to EnZona for a request on base_url
+    # (scheme + host + port).
+    def redirect_uri(base_url)
+      path = ENV.fetch("ENZONA_CALLBACK_PATH", LEGACY_CALLBACK_PATH)
+      path = LEGACY_CALLBACK_PATH unless CALLBACK_PATHS.include?(path)
+      "#{base_url}#{path}"
     end
 
     def client

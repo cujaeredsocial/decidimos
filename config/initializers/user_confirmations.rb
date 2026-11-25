@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-# Manual account verification (no mail server yet).
+# Manual account confirmation (no mail server yet): makes a sign-up a
+# registered user. Identity verification is a separate step, see
+# config/initializers/verified_account.rb.
 # See app/controllers/decidim/admin/user_confirmations_controller.rb.
 
 # Admin route: /admin/user_confirmations. Same pattern Decidim modules use to
@@ -20,5 +22,5 @@ Decidim.menu :admin_user_menu do |menu|
 end
 
 Rails.application.config.to_prepare do
-  Decidim::AdminLog::UserPresenter.prepend(DecidimCujae::AdminLog::UserPresenterConfirm)
+  Decidim::AdminLog::UserPresenter.prepend(DecidimCujae::AdminLog::UserPresenterActions)
 end

@@ -4,6 +4,7 @@
   <h1 class="item_show__header-title">
     <%= t(".title") %>
     <%= link_to t("decidim.surveys.admin.survey_exchanges.export"), export_survey_exchange_path(survey), class: "button button__sm button__transparent-secondary" %>
+    <%= link_to t("decidim.surveys.admin.survey_exchanges.offline"), offline_survey_exchange_path(survey), class: "button button__sm button__transparent-secondary", title: t("decidim.surveys.admin.survey_exchanges.offline_help") %>
   </h1>
 </div>
 

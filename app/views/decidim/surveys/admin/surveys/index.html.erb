@@ -79,6 +79,12 @@
                       <% end %>
                     </li>
                     <li class="dropdown__item">
+                      <%= link_to offline_survey_exchange_path(survey), class: "dropdown__button" do %>
+                        <%= icon "phone-line" %>
+                        <%= t("decidim.surveys.admin.survey_exchanges.offline") %>
+                      <% end %>
+                    </li>
+                    <li class="dropdown__item">
                       <%= link_to import_survey_exchange_path(survey), class: "dropdown__button" do %>
                         <%= icon "upload-line" %>
                         <%= t("decidim.surveys.admin.survey_exchanges.import_into") %>

@@ -90,6 +90,12 @@ en:
         verify: "%{user_name} verified the identity of participant %{resource_name}"
   decidim_cujae:
     verified_account:
+      banner:
+        button: Verify now
+        description: Verify your account to prove you are a real person and take part in every action on the platform.
+        title: Your account is not verified
+      menu:
+        verify: Verify your account
       authorizations:
         errors:
           already_used: This EnZona identity already verifies another account.

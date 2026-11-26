@@ -1,0 +1,33 @@
+<%# locals: url, show_as_new %>
+<div class="item__edit item__edit-1col">
+  <div class="item__edit-form">
+    <%= render "decidim/surveys/admin/survey_exchanges/errors" %>
+    <%= form_with url:, method: :post, multipart: true, html: { id: "survey-exchange-form", class: "form form-defaults" } do %>
+      <div class="form__wrapper">
+        <div class="card">
+          <div class="card-section">
+            <p class="help-text"><%= t("decidim.surveys.admin.survey_exchanges.form.help") %></p>
+            <div class="row column">
+              <%= label_tag :file, t("decidim.surveys.admin.survey_exchanges.form.file") %>
+              <%= file_field_tag :file, accept: "application/json,.json", required: true %>
+            </div>
+            <% if show_as_new %>
+              <div class="row column">
+                <%= label_tag :as_new do %>
+                  <%= check_box_tag :as_new, "1", false %>
+                  <%= t("decidim.surveys.admin.survey_exchanges.form.as_new") %>
+                <% end %>
+                <p class="help-text"><%= t("decidim.surveys.admin.survey_exchanges.form.as_new_help") %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class="item__edit-sticky">
+        <div class="item__edit-sticky-container">
+          <%= submit_tag t("decidim.surveys.admin.survey_exchanges.form.submit"), class: "button button__sm button__secondary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

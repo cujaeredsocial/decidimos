@@ -1,0 +1,12 @@
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="item_show__header">
+  <h1 class="item_show__header-title">
+    <%= t(".title") %>
+    <%= link_to t("decidim.surveys.admin.survey_exchanges.back"), surveys_path, class: "button button__sm button__secondary" %>
+  </h1>
+</div>
+
+<p class="help-text"><%= t(".help") %></p>
+
+<%= render "decidim/surveys/admin/survey_exchanges/form", url: survey_exchanges_path, show_as_new: false %>

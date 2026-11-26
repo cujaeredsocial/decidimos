@@ -1,0 +1,17 @@
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="item_show__header" style="border-bottom: none;">
+  <h1 class="item_show__header-title">
+    <%= t(".title") %>
+    <%= link_to t("decidim.surveys.admin.survey_exchanges.export"), export_survey_exchange_path(survey), class: "button button__sm button__transparent-secondary" %>
+  </h1>
+</div>
+
+<%= render "decidim/surveys/admin/surveys/tabs_menu" %>
+
+<% unless survey.questionnaire.questions_editable? %>
+  <div class="callout warning"><%= t(".locked") %></div>
+<% end %>
+<p class="help-text"><%= t(".help") %></p>
+
+<%= render "decidim/surveys/admin/survey_exchanges/form", url: import_survey_exchange_path(survey), show_as_new: true %>

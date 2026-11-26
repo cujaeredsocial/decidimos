@@ -11,6 +11,7 @@
 # collide with the engine's `resources :surveys` (e.g. GET surveys/:id).
 Decidim::Surveys::AdminEngine.routes do
   get "surveys/:id/exchange/export", to: "survey_exchanges#export", as: :export_survey_exchange
+  get "surveys/:id/exchange/offline", to: "survey_exchanges#offline", as: :offline_survey_exchange
   get "surveys/:id/exchange/import", to: "survey_exchanges#edit", as: :import_survey_exchange
   post "surveys/:id/exchange/import", to: "survey_exchanges#update"
   post "surveys/:id/exchange/responses", to: "survey_exchanges#import_responses", as: :import_survey_responses_exchange

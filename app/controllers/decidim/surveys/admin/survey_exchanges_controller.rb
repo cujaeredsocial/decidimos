@@ -22,6 +22,16 @@ module Decidim
           send_data JSON.pretty_generate(data), filename: exporter.filename, type: "application/json", disposition: "attachment"
         end
 
+        # GET surveys/:id/exchange/offline
+        # Single HTML file to respond the survey without a connection; it
+        # produces a decidim.survey.responses file for import_responses.
+        def offline
+          enforce_permission_to(:update, :questionnaire, questionnaire: survey)
+
+          app = DecidimCujae::SurveyExchange::OfflineApp.new(survey, host: request.host)
+          send_data app.call, filename: app.filename, type: "text/html; charset=utf-8", disposition: "attachment"
+        end
+
         # GET surveys/:id/exchange/import
         def edit
           enforce_permission_to(:update, :questionnaire, questionnaire: survey)

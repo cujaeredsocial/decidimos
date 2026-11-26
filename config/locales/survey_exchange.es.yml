@@ -8,6 +8,8 @@ es:
           import_into: Importar desde archivo
           import_new: Importar encuesta
           menu: Importar / exportar
+          offline: Exportar app offline (HTML)
+          offline_help: Un único archivo HTML para responder la encuesta sin conexión. Al terminar genera un JSON de respuestas que se importa en "Importar respuestas".
           codes:
             invalid_file: El archivo no es una definición de encuesta válida.
             invalid_signature: La firma de integridad no es válida; el archivo se modificó después de exportarlo.

@@ -8,6 +8,8 @@ en:
           import_into: Import from file
           import_new: Import survey
           menu: Import / export
+          offline: Export offline app (HTML)
+          offline_help: A single HTML file to respond the survey without a connection. When finished it produces a responses JSON to import in "Import responses".
           codes:
             invalid_file: The file is not a valid survey definition.
             invalid_signature: The integrity signature is not valid; the file was modified after it was exported.

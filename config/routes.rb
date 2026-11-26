@@ -5,6 +5,13 @@ Rails.application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 
+  # Legacy EnZona callback (the redirect URI registered in EnZona when it was
+  # a sign-in provider) -> the verification callback, keeping code/state.
+  # See DecidimCujae::Enzona::LEGACY_CALLBACK_PATH.
+  get DecidimCujae::Enzona::LEGACY_CALLBACK_PATH, to: redirect(status: 302) { |_params, request|
+    [DecidimCujae::Enzona::CALLBACK_PATH, request.query_string.presence].compact.join("?")
+  }
+
   mount Decidim::Core::Engine => '/'
   authenticate :user, ->(u) { u.admin? } do
     mount Sidekiq::Web => "/sidekiq"

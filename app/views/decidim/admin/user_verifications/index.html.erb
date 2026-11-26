@@ -1,0 +1,96 @@
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="card" id="user-verifications">
+  <div class="item_show__header">
+    <h1 class="item_show__header-title"><%= t(".title") %></h1>
+  </div>
+
+  <p class="mb-4"><%= t(".description") %></p>
+
+  <div class="filters__section">
+    <div class="fcell search">
+      <%= form_tag user_verifications_path, method: :get do %>
+        <%= hidden_field_tag :state, state %>
+        <div class="input-group">
+          <%= search_field_tag :q, search_term, placeholder: t(".search_placeholder"), class: "input-group-field" %>
+          <div class="input-group-button">
+            <button type="submit" class="text-secondary" aria-label="<%= t(".search_placeholder") %>">
+              <%= icon "search-line", class: "fill-secondary w-4 h-4" %>
+            </button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex gap-2 my-4">
+    <% Decidim::Admin::UserVerificationsController::STATES.each do |s| %>
+      <%= link_to t(".states.#{s}"),
+                  user_verifications_path(state: s, q: search_term.presence),
+                  class: "button button__xs #{s == state ? "button__secondary" : "button__transparent-secondary"}" %>
+    <% end %>
+  </div>
+
+  <% if @users.empty? %>
+    <p class="mt-4"><%= t(".empty.#{state}") %></p>
+  <% else %>
+    <div class="table-stacked">
+      <table class="table-list">
+        <thead>
+          <tr>
+            <th><%= t(".name") %></th>
+            <th><%= t(".nickname") %></th>
+            <th><%= t(".status") %></th>
+            <th><%= t(".actions") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @users.each do |user| %>
+            <% authorization = authorizations_by_user[user.id] %>
+            <tr data-user-id="<%= user.id %>">
+              <td data-label="<%= t(".name") %>"><%= user.name %></td>
+              <td data-label="<%= t(".nickname") %>"><%= user.nickname %></td>
+              <td data-label="<%= t(".status") %>">
+                <% if authorization %>
+                  <%= t(".methods.#{authorization.metadata.to_h["method"].presence || "manual"}") %>
+                  · <%= l authorization.granted_at, format: :short %>
+                <% else %>
+                  <%= t(".not_verified") %>
+                <% end %>
+              </td>
+              <td data-label="<%= t(".actions") %>" class="table-list__actions">
+                <% if allowed_to?(:show_email, :user, user: user) %>
+                  <%= link_to show_email_officialization_path(user_id: user.id),
+                              class: "button button__xs button__transparent-secondary",
+                              data: { full_name: user.name, dialog_open: "show-email-modal" } do %>
+                    <%= icon "mail-open-line" %>
+                    <span><%= t("decidim.admin.officializations.index.show_email") %></span>
+                  <% end %>
+                <% end %>
+                <% if authorization %>
+                  <%= link_to user_verification_path(user.id, q: search_term.presence, state: state),
+                              method: :delete,
+                              class: "button button__xs button__transparent-secondary",
+                              data: { confirm: t(".revoke_question", name: user.name) } do %>
+                    <%= icon "close-circle-line" %>
+                    <span><%= t(".revoke") %></span>
+                  <% end %>
+                <% else %>
+                  <%= link_to user_verification_path(user.id, q: search_term.presence, state: state),
+                              method: :patch,
+                              class: "button button__xs button__secondary",
+                              data: { confirm: t(".verify_question", name: user.name) } do %>
+                    <%= icon "checkbox-circle-line" %>
+                    <span><%= t(".verify") %></span>
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>
+<%= decidim_paginate @users %>
+<%= render "decidim/admin/officializations/show_email_modal" %>

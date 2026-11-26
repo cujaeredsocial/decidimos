@@ -1,0 +1,8 @@
+# Decidim ships its own es-MX Devise strings, which win over config/locales/es.yml
+# for es-MX users (the organization's default locale). Keep in sync with es.yml.
+es-MX:
+  devise:
+    failure:
+      unconfirmed: Espere hasta que su cuenta sea confirmada, por favor contacta a soporte en caso de una demora muy prolongada.
+    registrations:
+      signed_up_but_unconfirmed: Espere hasta que su cuenta sea confirmada, por favor contacta a soporte en caso de una demora muy prolongada.

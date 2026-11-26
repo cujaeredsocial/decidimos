@@ -17,7 +17,7 @@ gem "decidim", "0.31.5"
 gem "bootsnap", "~> 1.3"
 
 gem "puma", ">= 6.3.1"
-gem "omniauth-oauth2"
+gem "oauth2", "~> 2.0" # EnZona identity verification (lib/decidim_cujae/enzona.rb)
 gem "rack-proxy", "~> 0.7"
 
 group :development, :test do

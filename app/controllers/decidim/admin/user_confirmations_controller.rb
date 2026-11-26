@@ -2,7 +2,7 @@
 
 module Decidim
   module Admin
-    # Manual account verification while the platform has no mail server.
+    # Manual account confirmation while the platform has no mail server.
     #
     # Lists the participants who registered but never confirmed their email
     # and lets an admin confirm them, which unblocks their sign in (Devise

@@ -28,37 +28,86 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
-    
   devise:
     failure:
-      unconfirmed: Please wait until your account is verified. Contact support if it takes too long.
+      unconfirmed: Please wait until your account is confirmed. Contact support if it takes too long.
     registrations:
-      signed_up_but_unconfirmed: Please wait until your account is verified. Contact support if it takes too long.
+      signed_up_but_unconfirmed: Please wait until your account is confirmed. Contact support if it takes too long.
   decidim:
-    system:
-      organizations:
-        omniauth_settings:
-          xetid:
-            client_id: Client ID
-            client_secret: Client secret
+    authorization_handlers:
+      verified_account:
+        name: Verified account
+        explanation: Prove that you are a real person by signing in to EnZona, or ask an administrator to verify you.
     admin:
       menu:
-        user_confirmations: Account verification
+        user_confirmations: Account confirmation
+        user_verifications: Account verification
       user_confirmations:
         index:
           actions: Actions
-          confirm: Verify
-          confirm_question: "Verify the account of %{name}? They will be able to sign in right away."
+          confirm: Confirm
+          confirm_question: "Confirm the account of %{name}? They will be able to sign in right away."
           created_at: Registered at
-          description: Registered participants whose account is not verified yet. Once verified they can sign in.
-          empty: There are no accounts pending verification.
+          description: Registered participants whose account is not confirmed yet. Once confirmed they can sign in. Confirming an account does not verify the person's identity.
+          empty: There are no accounts pending confirmation.
           name: Name
           nickname: Nickname
           search_placeholder: Search by name, nickname or email
+          title: Account confirmation
+        update:
+          success: The account of %{name} has been confirmed.
+      user_verifications:
+        index:
+          actions: Actions
+          description: Verify that a confirmed participant is a real person. Participants can also verify themselves by signing in to EnZona from My account > Authorizations.
+          empty:
+            pending: There are no confirmed accounts pending verification.
+            verified: There are no verified accounts.
+          methods:
+            enzona: Verified with EnZona
+            manual: Verified by an administrator
+          name: Name
+          nickname: Nickname
+          not_verified: Not verified
+          revoke: Revoke
+          revoke_question: "Revoke the verification of %{name}? They will lose access to actions that require a verified account."
+          search_placeholder: Search by name, nickname or email
+          states:
+            pending: Not verified
+            verified: Verified
+          status: Status
           title: Account verification
+          verify: Verify
+          verify_question: "Verify that %{name} is a real person?"
+        destroy:
+          success: The verification of %{name} has been revoked.
         update:
           success: The account of %{name} has been verified.
     admin_log:
       user:
-        confirm: "%{user_name} verified the account of participant %{resource_name}"
+        confirm: "%{user_name} confirmed the account of participant %{resource_name}"
+        unverify: "%{user_name} revoked the verification of participant %{resource_name}"
+        verify: "%{user_name} verified the identity of participant %{resource_name}"
+  decidim_cujae:
+    verified_account:
+      authorizations:
+        errors:
+          already_used: This EnZona identity already verifies another account.
+          cancelled: The EnZona sign-in was cancelled.
+          error: EnZona could not verify your identity. Please try again later.
+          invalid_state: The EnZona sign-in expired or is invalid. Please try again.
+          not_configured: Verification with EnZona is not available right now.
+        new:
+          description: A verified account proves that you are a real person. Some actions on the platform require it.
+          enzona_button: Verify with EnZona
+          enzona_help: Your EnZona identity can only verify one account.
+          enzona_title: With EnZona
+          enzona_unavailable: Verification with EnZona is not available right now.
+          manual_help: If you don't have EnZona, contact an administrator of the platform to verify your identity.
+          manual_title: By an administrator
+          steps:
+            back: You come back here and your account is verified right away.
+            sign_in: Sign in to EnZona with your usual account and accept sharing your identity with this platform.
+            start: Click "Verify with EnZona".
+          title: Verify your account
+        success: Your account has been verified with EnZona.

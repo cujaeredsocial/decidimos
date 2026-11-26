@@ -10,6 +10,8 @@ services:
     environment:
       - BOOT_SETUP=1
       - PORT=3000
+      - ENZONA_CLIENT_ID=dev
+      - ENZONA_CLIENT_SECRET=dev
       - DATABASE_HOST=pg
       - RAILS_ENV=development
       - DATABASE_USERNAME=postgres

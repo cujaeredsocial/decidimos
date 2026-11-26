@@ -56,6 +56,27 @@ module DecidimCujae
         { result:, used: }
       end
 
+      # Resolves one locale of a file ("es", "es-ES", "es_es", "ES-mx") to one
+      # of the organization's locales, with the same rules as map_locales:
+      # exact match (case-insensitive) first, then the same language,
+      # preferring the plain language ("es"), then the default locale when it
+      # is of that language, then the first one available. nil if the
+      # organization has no locale of that language.
+      def self.resolve_locale(locale, locales, default: nil)
+        return nil unless locale.is_a?(String) && locale.match?(/\A[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,8})*\z/)
+
+        locale = locale.tr("_", "-")
+        locales = locales.map(&:to_s)
+        exact = locales.find { |l| l.casecmp?(locale) }
+        return exact if exact
+
+        base = locale.split("-").first
+        same_language = locales.select { |l| l.split("-").first.casecmp?(base) }
+        same_language.find { |l| l.casecmp?(base) } ||
+          (default.to_s if same_language.include?(default.to_s)) ||
+          same_language.first
+      end
+
       attr_reader :errors, :warnings
 
       def initialize(data, locales:)

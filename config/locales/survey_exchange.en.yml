@@ -25,7 +25,7 @@ en:
             as_new: Treat as a new survey (ignore identifiers)
             as_new_help: Use it to copy here a survey exported from another survey or installation. Current questions are deleted and all the questions of the file are created.
             file: Survey file (.json, decidim.survey format)
-            help: Format described in docs/survey-exchange-formats.md. Only the definition is imported (questions, options, conditions and settings), never the responses.
+            help: Format described in docs/survey-exchange-formats.md. Only the definition is imported (questions, options, conditions and settings), responses are imported below.
             submit: Import
           import:
             invalid: Nothing was imported. Check the errors.
@@ -34,6 +34,22 @@ en:
             warnings:
               one: 'Warning: %{list}'
               other: 'Warnings (%{count}): %{list}'
+          responses_codes:
+            invalid_file: The file is not a valid responses file.
+            invalid_signature: The integrity signature is not valid; the file was modified after it was exported.
+            stale_reference: The survey questions changed after its definition was exported. Export it again and use the new UUIDs.
+          responses:
+            allow_identified: Allow attributing responses to registered users (respondent.kind "user")
+            allow_identified_help: This is responding on behalf of those people. Organization admins only; it is recorded in the audit log.
+            discarded:
+              one: 1 answer to a question hidden by its display conditions was discarded.
+              other: "%{count} answers to questions hidden by their display conditions were discarded."
+            file: Responses file (.json, decidim.survey.responses format)
+            help: Import participations from another system (paper, Typeform, ...). Questions and options are referenced by the UUIDs of an export of this survey's definition.
+            report_json: Full report (JSON)
+            result: 'Responses: %{imported} participations imported, %{skipped} skipped and %{errors} errors.'
+            submit: Import responses
+            title: Import responses
           new:
             help: Create a new survey in this component from an exported file (from this or another installation).
             title: Import survey from file

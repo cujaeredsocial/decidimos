@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module DecidimCujae
-  # Import/export of survey definitions in the `decidim.survey` JSON format.
-  # Specification: docs/survey-exchange-formats.md (sections 3 and 5).
+  # Import/export of survey definitions (`decidim.survey`) and import of
+  # responses (`decidim.survey.responses`) in JSON.
+  # Specification: docs/survey-exchange-formats.md (sections 3, 4 and 5).
   module SurveyExchange
     FORMAT = "decidim.survey"
     VERSION = 1
@@ -27,6 +28,16 @@ module DecidimCujae
       text_chars: 5_000,
       html_chars: 100_000,
       regex_chars: 500
+    }.freeze
+
+    # `decidim.survey.responses` (spec section 4).
+    RESPONSES_FORMAT = "decidim.survey.responses"
+    RESPONSE_LIMITS = {
+      file_bytes: 20 * 1024 * 1024, # files are embedded as base64 (SEC12)
+      submissions: 5_000,
+      answer_chars: 50_000,
+      external_id_chars: 200,
+      files_per_answer: 10
     }.freeze
 
     # A failure that aborts the whole import. `code` is one of the codes of

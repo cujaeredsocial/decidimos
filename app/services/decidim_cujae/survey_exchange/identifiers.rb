@@ -107,6 +107,24 @@ module DecidimCujae
         @conditions_by_question[question.id]
       end
 
+      # respondent_uuid of a participant (spec 5.3). Never changes for the
+      # same participant and questionnaire.
+      def respondent_uuid(session_token)
+        self.class.content_uuid(key, { kind: "respondent", session_token: session_token.to_s })
+      end
+
+      # Submission.uuid (spec 5.3).
+      def submission_uuid(session_token)
+        self.class.content_uuid(key, { kind: "submission", session_token: session_token.to_s })
+      end
+
+      # respondent_uuid => session_token for every participant that already
+      # responded to this questionnaire (spec 5.4: one HMAC per token).
+      def respondents
+        @respondents ||= Decidim::Forms::Response.where(questionnaire:).distinct.pluck(:session_token).compact
+                                                 .index_by { |token| respondent_uuid(token) }
+      end
+
       # Survey fingerprint (survey.uuid / target.survey_uuid).
       def fingerprint
         @fingerprint ||= self.class.content_uuid(key, {

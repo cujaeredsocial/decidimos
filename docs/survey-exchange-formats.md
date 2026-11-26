@@ -399,7 +399,7 @@ El exportador genera las `key` a partir de la posición (`q<i>`, `q<i>_o<j>`, `q
   - El `session_token` es un dato **interno**: **NO DEBE** aparecer en ningún fichero (SEC5).
 - **`ip_hash`**: `tokenize(remote_ip)` con el mismo tokenizer, o `null`.
 - **`ResponseChoice.body`** es una **copia** del texto de la opción en el locale de la participación (`translated_attribute(response_option.body)`), no una referencia.
-- **`separator` y `title_and_description`** también generan una fila `Response` con `body` igual a `"separator"` o `"title-and-description"`. El importador **DEBE** crearlas para que el resultado sea igual que una respuesta hecha en la web.
+- **`separator` y `title_and_description`**: el formulario web envía `body` igual a `"separator"` o `"title-and-description"`. En 0.31.5 solo se guarda la fila de `title_and_description`; las de `separator` las descarta `QuestionnaireForm#responses_by_step`. El importador **DEBE** dar el mismo resultado que una respuesta hecha en la web (lo consigue enviando esos `body` al mismo comando).
 
 ### 4.2 Esquema TypeScript
 
@@ -447,7 +447,14 @@ export interface Submission {
   respondent: Respondent;
   /** Response#created_at. Default: ahora. */
   submitted_at?: string;
-  /** Locale con el que se copia el texto de la opción en choice.body. Default: locale por defecto de la organización. */
+  /**
+   * Locale con el que se copia el texto de la opción en choice.body. Default: locale por defecto de la organización.
+   * Los locales son de la organización (los espacios, componentes y encuestas no tienen locales propios).
+   * Se acepta cualquier variante de un idioma que la organización tenga, sin distinguir mayúsculas y con "-" o "_":
+   * coincidencia exacta → idioma a secas ("es") → locale por defecto si es de ese idioma → primera variante.
+   * Ej.: con ["en", "es-MX"], "es", "es-ES" y "es_mx" se aplican como "es-MX" (con aviso en el informe).
+   * Un idioma que la organización no tiene → error "invalid_locale" en esa participación.
+   */
   locale?: string;
   /** IP en claro; el servidor la hashea y nunca la guarda tal cual. No se acepta un ip_hash ya calculado (SEC5). */
   ip?: string;
@@ -615,7 +622,13 @@ Con eso se reutilizan las validaciones, el filtrado por display conditions y la 
 
 Opción B: crear las filas directamente como hace `ResponseQuestionnaire#response_questionnaire`, después de validar cada respuesta con `ResponseForm`.
 
-**No verificado:** no se ha comprobado en ejecución que la opción A funcione fuera de un controlador. Prueba propuesta: ejecutar un `bin/rails runner` en `decidimos-app-1` que importe una participación anónima en una encuesta de prueba y después la borre.
+**Verificado (2026-11-26):** la opción A funciona fuera de un controlador (`bin/rails runner` en `decidimos-app-1`). Implementación: `DecidimCujae::SurveyExchange::ImportResponses`, que usa `SaveSubmission` (subclase de `ResponseQuestionnaire` que solo publica eventos con `publish_events: true`). Detalles:
+
+- Se construye un `ResponseForm` por cada pregunta del cuestionario, como el formulario web.
+- Las display conditions se evalúan sobre las respuestas de la participación y el resultado sustituye a `ResponseForm#display_conditions_fulfilled?`. El de Decidim no sirve fuera de la web: `responded` usa `form.present?` (siempre verdadero) y `equal` mira todas las opciones que envía el HTML, no solo la elegida. Con `enforce_display_conditions: false` también se guardan las respuestas a preguntas ocultas.
+- Los ficheros se suben como `ActiveStorage::Blob` y se pasan en `add_documents` (`{ file: signed_id, title: }`). Así `Decidim::Attachment` aplica las extensiones y el tamaño de la organización (R10). Los blobs que no llegan a adjuntarse se borran.
+- R2, R3, R7 (cada opción una sola vez) y R11 los comprueba el importador, porque `ResponseForm` no lo hace.
+- `validation: "lenient"`: si Decidim rechaza alguna respuesta, se quitan esas respuestas y se reintenta una vez. Si sigue fallando (por ejemplo, falta una obligatoria), se rechaza la participación.
 
 ### 4.7 Exportación
 
@@ -840,7 +853,7 @@ Esta `jcs` mínima solo vale porque las proyecciones contienen strings, enteros,
 |---|---|---|
 | D1 | Los UUID se calculan con clave secreta, así que **solo el servidor** puede calcularlos. Si alguna herramienta externa (por ejemplo, un editor en TypeScript) tuviera que calcular UUID por su cuenta, habría que usar una clave pública (UUID v5 o SHA-256 sin secreto) y se perdería la propiedad "no falsificable" (SEC6), con lo que la firma pasaría a ser obligatoria. | Decidido: con clave secreta. Revisar si aparece ese caso de uso. |
 | D2 | Punto de entrada: rake task, botón en el admin o endpoint API. Cualquiera DEBE cumplir SEC1–SEC2. | Decidido: panel de admin del componente de encuestas (pestaña "Importar / exportar" de cada encuesta, opción "Exportar" en el listado y botón "Importar encuesta" para crear una nueva). Ver `config/initializers/survey_exchange.rb`. |
-| D3 | Opción A u opción B para guardar respuestas (4.6). | Abierto. Hay que verificar la opción A. |
+| D3 | Opción A u opción B para guardar respuestas (4.6). | Decidido: opción A, verificada en ejecución (ver 4.6). Punto de entrada: sección "Importar respuestas" de la pestaña "Importar / exportar" de cada encuesta (`POST surveys/:id/exchange/responses`, mismo permiso que D7). Límites: fichero de 20 MB, 5 000 participaciones, 50 000 caracteres por texto, 10 ficheros por respuesta (`RESPONSE_LIMITS`). La casilla `allow_identified_respondents` (SEC7) solo se muestra a administradores de la organización. |
 | D4 | Si al reemplazar preguntas con `mode: "replace"` se permite `override_edit!` aunque haya respuestas. | Decidido: no. Si las preguntas del fichero coinciden exactamente con las actuales (mismos UUID y contenido) se aplican título, descripción, términos y ajustes; si no, error `questions_not_editable`. |
 | D5 | Si Decidim impide más de una respuesta por usuario aunque `allow_editing_responses` sea false (`ResponseQuestionnaire#user_already_responded?`). | Visto en el código; falta comprobarlo en ejecución. |
 | D6 | Si el export de respuestas incluye los adjuntos en base64 o los omite. | Abierto. |

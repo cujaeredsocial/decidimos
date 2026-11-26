@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Import/export of survey definitions (decidim.survey JSON format).
+# Import/export of survey definitions (decidim.survey JSON format) and
+# import of responses (decidim.survey.responses).
 # Spec: docs/survey-exchange-formats.md. Code: app/services/decidim_cujae/survey_exchange*,
 # app/commands/decidim_cujae/survey_exchange/import_survey.rb and
 # app/controllers/decidim/surveys/admin/survey_exchanges_controller.rb.
@@ -12,6 +13,7 @@ Decidim::Surveys::AdminEngine.routes do
   get "surveys/:id/exchange/export", to: "survey_exchanges#export", as: :export_survey_exchange
   get "surveys/:id/exchange/import", to: "survey_exchanges#edit", as: :import_survey_exchange
   post "surveys/:id/exchange/import", to: "survey_exchanges#update"
+  post "surveys/:id/exchange/responses", to: "survey_exchanges#import_responses", as: :import_survey_responses_exchange
   get "survey_exchanges/new", to: "survey_exchanges#new", as: :new_survey_exchange
   post "survey_exchanges", to: "survey_exchanges#create", as: :survey_exchanges
 end

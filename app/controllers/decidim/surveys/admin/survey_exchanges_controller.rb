@@ -11,7 +11,7 @@ module Decidim
       #
       # Routes: config/initializers/survey_exchange.rb.
       class SurveyExchangesController < Admin::ApplicationController
-        helper_method :survey, :import_errors, :import_warnings
+        helper_method :survey, :import_errors, :import_warnings, :responses_report, :responses_errors, :allow_identified_respondents?
 
         # GET surveys/:id/exchange/export
         def export
@@ -41,6 +41,28 @@ module Decidim
                 import_failed(error, :edit)
               end
             end
+          end
+        end
+
+        # POST surveys/:id/exchange/responses
+        # Imports participations (decidim.survey.responses, spec section 4).
+        def import_responses
+          enforce_permission_to(:update, :questionnaire, questionnaire: survey)
+
+          with_uploaded_json(limit: DecidimCujae::SurveyExchange::RESPONSE_LIMITS[:file_bytes], on_error: :responses_failed) do |data, sha256|
+            allow_identified = params[:allow_identified_respondents] == "1" && allow_identified_respondents?
+            report = failure = nil
+            # Decidim::Command runs the `on` blocks on the command, so
+            # instance variables set there would not reach the view.
+            DecidimCujae::SurveyExchange::ImportResponses.call(survey, data, current_user, allow_identified_respondents: allow_identified, file_sha256: sha256) do
+              on(:ok) { |result| report = result }
+              on(:invalid) { |error| failure = error }
+            end
+            next responses_failed(failure) if failure
+
+            @responses_report = report
+            flash.now[report.errors.any? ? :warning : :notice] = responses_message(report)
+            render :edit
           end
         end
 
@@ -96,24 +118,45 @@ module Decidim
           @import_warnings || []
         end
 
-        def with_uploaded_json
-          file = params[:file]
-          limit = DecidimCujae::SurveyExchange::LIMITS[:file_bytes]
-          if !file.respond_to?(:read)
-            return import_failed(DecidimCujae::SurveyExchange::Error.new(:invalid_file, [t("decidim.surveys.admin.survey_exchanges.errors.no_file")]), form_action)
-          elsif file.size > limit
-            return import_failed(DecidimCujae::SurveyExchange::Error.new(:invalid_file, [t("decidim.surveys.admin.survey_exchanges.errors.too_big", size: limit / 1024)]),
-                                 form_action)
+        def with_uploaded_json(limit: DecidimCujae::SurveyExchange::LIMITS[:file_bytes], on_error: nil)
+          reject = lambda do |message|
+            error = DecidimCujae::SurveyExchange::Error.new(:invalid_file, [message])
+            on_error ? send(on_error, error) : import_failed(error, form_action)
           end
+          file = params[:file]
+          return reject.call(t("decidim.surveys.admin.survey_exchanges.errors.no_file")) unless file.respond_to?(:read)
+          return reject.call(t("decidim.surveys.admin.survey_exchanges.errors.too_big", size: limit / 1024)) if file.size > limit
 
           content = file.read.force_encoding(Encoding::UTF_8)
           begin
             data = JSON.parse(content, max_nesting: 32)
           rescue JSON::ParserError
-            return import_failed(DecidimCujae::SurveyExchange::Error.new(:invalid_file, [t("decidim.surveys.admin.survey_exchanges.errors.not_json")]), form_action)
+            return reject.call(t("decidim.surveys.admin.survey_exchanges.errors.not_json"))
           end
 
           yield data, Digest::SHA256.hexdigest(content)
+        end
+
+        attr_reader :responses_report
+
+        def responses_errors
+          @responses_errors || []
+        end
+
+        # SEC7: attributing responses to real users is for organization admins only.
+        def allow_identified_respondents?
+          current_user&.admin? ? true : false
+        end
+
+        def responses_failed(error)
+          @responses_errors = [t("decidim.surveys.admin.survey_exchanges.responses_codes.#{error.code}", default: error.code.to_s)] + error.details
+          flash.now[:alert] = t("decidim.surveys.admin.survey_exchanges.import.invalid")
+          render :edit, status: :unprocessable_entity
+        end
+
+        def responses_message(report)
+          t("decidim.surveys.admin.survey_exchanges.responses.result",
+            imported: report.imported, skipped: report.skipped.size, errors: report.errors.size)
         end
 
         def create_survey(data)

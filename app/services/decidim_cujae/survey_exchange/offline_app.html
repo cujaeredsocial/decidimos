@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Encuesta</title>
+
+<!-- Definición de la encuesta -->
+<script type="application/json" id="survey-data"></script>
+
+<style>
+:root{--ink:#152a20;--muted:#69807a;--line:#e3ece7;--surface:#fff;--accent:#1fae6a;--accent-d:#178f57;--soft:#e8f8ef;--danger:#c2410c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;padding:20px 14px 40px;color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:radial-gradient(900px 500px at 5% -10%,#d9f5e5 0%,transparent 60%),radial-gradient(800px 500px at 105% 0%,#ffe6d8 0%,transparent 55%),linear-gradient(165deg,#f6fbf8 0%,#eef6ff 100%) fixed}
+.app{width:100%;max-width:600px;background:var(--surface);border-radius:24px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px -28px rgba(11,60,38,.45),0 2px 6px rgba(11,60,38,.05)}
+.head{padding:18px 20px 14px;background:linear-gradient(180deg,#fbfffd,#fff)}
+.head-row{display:flex;align-items:center;gap:10px}.logo{font-size:26px}
+h1{flex:1;margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+#stepnum{font-size:13px;color:var(--muted)}
+.head .qsub{margin:8px 0 0}
+.progress{height:6px;border-radius:99px;background:#eaf2ee;margin-top:14px;overflow:hidden}
+#bar{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#2fbf71,#7bd389);transition:width .35s ease}
+.step{padding:22px 20px 0;animation:up .28s ease both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.step.shake{animation:shake .3s ease}
+.q{margin:0 0 4px;font-size:20px;font-weight:700;letter-spacing:-.015em;line-height:1.25;outline:0}
+.qsub{margin:0 0 16px;font-size:14px;color:var(--muted)}.qsub:empty{display:none}.qsub p{margin:0}
+.req{color:var(--danger)}
+.fld{width:100%;font:inherit;color:inherit;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;transition:border-color .15s,box-shadow .15s}
+.fld:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,174,106,.13)}
+textarea.fld{resize:vertical}
+.char-count{text-align:right;font-size:12px;color:var(--muted);margin:4px 0 0}
+.opts{display:grid;gap:10px}
+.opt{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:13px 14px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s,transform .12s}
+.opt:hover{border-color:#c2e3d1;background:#fbfefc}.opt:active{transform:scale(.985)}
+.opt:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,174,106,.13)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--soft);box-shadow:0 0 0 3px rgba(31,174,106,.12)}
+.opt>input[type=radio],.opt>input[type=checkbox]{position:absolute;opacity:0;width:1px;height:1px}
+.opt .txt{flex:1}
+.opt .fld{flex:0 0 calc(100% - 32px);width:auto;margin-left:32px;padding:10px 12px;border-radius:12px}
+.mark{width:20px;height:20px;border:2px solid #cfded6;border-radius:50%;flex:none;position:relative;transition:background .15s,border-color .15s}
+.mark.sq{border-radius:6px}
+input:checked~.mark{background:var(--accent);border-color:var(--accent)}
+input:checked~.mark::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
+input:checked~.mark.sq::after{width:10px;height:6px;border-radius:0;background:none;border:solid #fff;border-width:0 0 2px 2px;transform:translate(-50%,-65%) rotate(-45deg)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:340px}
+th,td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-size:14px}
+thead th,thead td{background:#f8fcf9;color:var(--muted);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+th[scope=row]{text-align:left;min-width:120px;font-weight:500}tr:last-child>*{border-bottom:0}
+td input{accent-color:var(--accent);width:20px;height:20px;margin:0}
+.sortable{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sortable li{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px}
+.sort-idx{width:24px;height:24px;border-radius:50%;background:var(--soft);color:var(--accent-d);display:grid;place-items:center;font-size:13px}
+.sort-label{flex:1}.sort-btns{display:flex;gap:6px}
+.sbtn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font-size:11px;cursor:pointer;color:var(--ink)}
+.sbtn:hover:not(:disabled){background:#f3faf6;border-color:#c2e3d1}.sbtn:disabled{opacity:.35;cursor:default}
+.err{color:var(--danger);font-size:13.5px;max-height:0;opacity:0;margin:0;overflow:hidden;transition:max-height .2s,opacity .2s,margin .2s}
+.err.show{max-height:56px;opacity:1;margin:12px 0 0}
+.nav{display:flex;gap:10px;padding:14px 0 20px}.nav>span{display:none}
+.btn{font:inherit;font-size:16px;font-weight:600;border:1.5px solid transparent;border-radius:14px;padding:13px 20px;background:var(--accent);color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;box-shadow:0 10px 20px -10px rgba(31,174,106,.9);transition:background .15s,transform .12s}
+.btn:hover{background:var(--accent-d)}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{flex:none;min-width:96px;background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:none}
+.btn.ghost:hover{background:#f8fbf9;border-color:#c9dbd1}
+.btn.mini{min-width:0;padding:3px 10px;font-size:13px}
+.btn.link{flex:none;margin:0 auto;background:none;border:0;box-shadow:none;color:var(--muted);text-decoration:underline;font-size:14px;font-weight:500;padding:8px}.btn.link:hover{background:none;color:var(--ink)}
+.btn.big{width:100%;flex:none}.btn.ok{background:var(--accent-d)}
+.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:14px 16px;border-radius:14px;font-size:14px}
+.tos-box{border:1px solid var(--line);border-radius:12px;margin:0 0 14px;padding:0 14px}.btn.big~.tos-box{margin-top:14px}
+summary{cursor:pointer;list-style:none;padding:11px 0;font-size:14px;color:var(--muted)}summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ "}details[open]>summary::before{content:"▾ "}
+.tos-content{font-size:13px;color:var(--muted);max-height:170px;overflow:auto;padding-bottom:10px}.tos-content p{margin:0 0 8px}
+.done .check-big,.check-big{width:64px;height:64px;border-radius:50%;background:var(--soft);color:var(--accent);font-size:30px;display:grid;place-items:center;margin:0 auto 12px}
+.done .q{font-size:22px;text-align:center}.done>.qsub{text-align:center}
+.steps{margin:0 0 16px;padding-left:1.2em;font-size:14px;color:var(--muted)}.steps li{margin:3px 0}
+.summary{border:1px solid var(--line);border-radius:16px;max-height:300px;overflow-y:auto;margin:0 0 16px}
+.row{display:flex;justify-content:space-between;gap:14px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:14px}.row:last-child{border:0}
+.row .k{color:var(--muted);flex:1 1 auto}.row .v{font-weight:600;text-align:right;flex:1 1 auto;word-break:break-word}
+.copied-note{display:none;margin-top:14px;background:var(--soft);border:1.5px solid #bfe8d2;color:#0f6b43;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:500}
+.copied-note.show{display:block;animation:up .25s ease both}
+.copied-note.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.copied-note p{margin:0}.copied-note p+p{margin-top:6px}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;margin:14px 0 0;text-align:center}
+.json{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;height:180px;margin-bottom:12px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:11px 18px;border-radius:99px;font-size:14px;max-width:min(92vw,420px);text-align:center;z-index:99;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+:focus-visible{outline:3px solid rgba(31,174,106,.5);outline-offset:2px}
+@media(max-width:420px){body{padding:12px 10px 30px}.app{border-radius:20px}.head{padding:16px 16px 12px}.step{padding:18px 16px 0}.q{font-size:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app"><header class="head"><div class="head-row"><span class="logo" aria-hidden="true">D</span><h1 id="t"></h1><span id="stepnum" aria-live="polite"></span></div><div id="survey-desc" class="qsub"></div><div class="progress" aria-hidden="true"><i id="bar"></i></div></header><main id="stage"><noscript>Esta encuesta necesita JavaScript.</noscript></main></div>
+<div id="toast" role="status"></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s),stage=$('#stage'),bar=$('#bar'),num=$('#stepnum');
+const fail=m=>{stage.innerHTML='<div class="step"><h2 class="q">No se puede mostrar la encuesta</h2><p class="qsub"></p></div>';stage.querySelector('p').textContent=m};
+let D;try{D=JSON.parse($('#survey-data').textContent)}catch(e){return fail('El JSON de la encuesta no es válido.')}
+if(D.format!=='decidim.survey'||D.version!==1||!D.survey||!D.survey.questionnaire)return fail('El formato de la encuesta no es compatible (se espera decidim.survey v1).');
+const S=D.survey,Q=S.questionnaire,qs=Q.questions.filter(q=>!q.deleted);
+const lk=o=>Object.keys(o||{}).filter(k=>k!=='machine_translations');
+/* Locale: exact match with the browser languages, then same language ("es-ES" → "es-MX"), then the organization default (<html lang>). */
+const loc=(()=>{const ks=lk(Q.title),base=l=>(l||'').toLowerCase().split(/[-_]/)[0],def=document.documentElement.lang,nav=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];
+ for(const n of nav){const e=ks.find(k=>k.toLowerCase()===n.toLowerCase().replace('_','-'))||ks.find(k=>base(k)===base(n));if(e)return e}
+ return ks.includes(def)?def:ks[0]})();
+const t=o=>o?(o[loc]||o[lk(o).find(k=>o[k])]||''):'';
+document.title=t(Q.title);
+
+const h=(tag,p={},...kids)=>{const e=document.createElement(tag);for(const k in p){const v=p[k];if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v===true)e.setAttribute(k,'');else if(v!==false&&v!=null)e.setAttribute(k,v)}kids.flat(9).forEach(c=>c!=null&&c!==false&&e.append(c));return e};
+const clean=html=>{const d=new DOMParser().parseFromString(html||'','text/html');d.querySelectorAll('script,iframe,object,embed,style,link').forEach(e=>e.remove());d.body.querySelectorAll('*').forEach(e=>[...e.attributes].forEach(a=>{if(/^on/i.test(a.name)||/^\s*javascript:/i.test(a.value))e.removeAttribute(a.name)}));return d.body.innerHTML};
+const rich=html=>{const d=h('div');d.innerHTML=clean(t(html));return d};
+
+$('#t').textContent=t(Q.title);$('#survey-desc').innerHTML=clean(t(Q.description));
+/* ---------- Estado y lógica ---------- */
+const A={},hist=[];let dir=1,errEl;
+const get=q=>A[q.key]||(A[q.key]={text:'',sel:[],free:{},rows:{},rank:null,files:[]});
+const opts=q=>(q.response_options||[]).filter(o=>!o.deleted);
+const rows=q=>(q.matrix_rows||[]).filter(r=>!r.deleted);
+const findQ=r=>qs.find(x=>x.key===r||x.uuid===r);
+const findO=(q,r)=>opts(q).find(o=>o.key===r||o.uuid===r);
+const info=q=>q.question_type==='title_and_description'||q.question_type==='separator';
+const isEmpty=q=>{const s=A[q.key];if(!s)return true;const y=q.question_type;
+ if(/short|long/.test(y))return !s.text.trim();
+ if(y==='sorting')return !s.rank;
+ if(y==='files')return !s.files.length;
+ if(/matrix/.test(y))return !Object.values(s.rows).some(a=>a.length);
+ return !s.sel.length};
+const texts=q=>{const s=A[q.key]||{};if(/short|long/.test(q.question_type))return [s.text||''];
+ const ks=/matrix/.test(q.question_type)?Object.values(s.rows||{}).flat():s.sel||[];
+ return ks.map(k=>t((findO(q,k)||{}).body)).concat(Object.values(s.free||{}))};
+function fulfilled(c){const cq=findQ(c.condition_question);if(!cq)return false;const s=A[cq.key],ty=c.condition_type;
+ if(ty==='responded')return !isEmpty(cq);
+ if(ty==='not_responded')return isEmpty(cq);
+ if(ty==='equal'||ty==='not_equal'){const o=findO(cq,c.response_option),has=!!(o&&s&&s.sel.includes(o.key));return ty==='equal'?has:!has}
+ if(ty==='match'){const p=t(c.condition_value);if(!p||p.length>200)return false;try{const re=new RegExp(p,'i');return texts(cq).some(x=>re.test(x))}catch(e){return false}}
+ return false}
+function vis(q){const cs=(q.display_conditions||[]).filter(c=>!c.deleted);if(!cs.length)return true;
+ const m=cs.filter(c=>c.mandatory),o=cs.filter(c=>!c.mandatory);
+ return m.every(fulfilled)&&(!o.length||o.some(fulfilled))}
+const list=()=>qs.filter(q=>q.question_type!=='separator'&&vis(q));
+const nextIdx=i=>{for(let j=i+1;j<qs.length;j++)if(!info(qs[j])||qs[j].question_type==='title_and_description'){if(vis(qs[j]))return j}return -1};
+
+function check(q){const s=get(q),y=q.question_type;if(!q.mandatory)return '';const m='Esta pregunta es obligatoria.';
+ if(/short|long/.test(y))return s.text.trim()?'':m;
+ if(y==='files')return s.files.length?'':'Adjunta al menos un archivo.';
+ if(/matrix/.test(y))return rows(q).every(r=>(s.rows[r.key]||[]).length)?'':'Responde todas las filas.';
+ if(y==='sorting')return '';
+ return s.sel.length?'':m}
+
+/* ---------- Pantallas ---------- */
+const toastEl=$('#toast');let tt;const toast=m=>{toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toastEl.classList.remove('show'),3200)};
+function show(node,p,lb){stage.replaceChildren(node);bar.style.width=p*100+'%';num.textContent=lb||'';const f=node.querySelector('[data-focus]');f&&f.focus({preventScroll:true});scrollTo(0,0)}
+const heading=(tag,txt,req)=>h(tag,{class:'q',tabindex:-1,'data-focus':true},txt,req&&h('span',{class:'req','aria-label':'obligatoria'},' *'));
+
+function intro(){const st=S.settings||{},n=Date.now();let msg='';
+ if(st.allow_responses===false)msg='Esta encuesta no admite respuestas ahora mismo.';
+ else if(st.starts_at&&n<Date.parse(st.starts_at))msg='La encuesta todavía no ha empezado.';
+ else if(st.ends_at&&n>Date.parse(st.ends_at))msg='La encuesta ya ha terminado.';
+ const go=h('button',{class:'btn',disabled:true,onclick:()=>{dir=1;step(nextIdx(-1))}},'Empezar');
+ const cb=h('input',{type:'checkbox',onchange:()=>go.disabled=!cb.checked});
+ show(h('section',{class:'step'},
+  msg?h('div',{class:'notice'},msg):[h('details',{class:'tos-box',open:true},h('summary',{},'Términos de participación'),h('div',{class:'tos-content'},rich(Q.tos))),h('label',{class:'opt'},cb,h('span',{class:'txt'},'Acepto los términos de participación'),h('span',{class:'mark sq'})),h('div',{class:'nav'},h('span'),go)]),0,'Antes de empezar')}
+
+function step(i){if(i<0)return done();const q=qs[i],s=get(q),L=list(),O=L.filter(x=>x.question_type!=='title_and_description');
+ const last=nextIdx(i)<0,say=m=>{errEl.textContent=m;errEl.classList.toggle('show',!!m);if(m){const n=stage.firstChild;n.classList.remove('shake');void n.offsetWidth;n.classList.add('shake')}};
+ errEl=h('p',{class:'err',role:'alert'});
+ const next=()=>{const e=check(q);if(e)return say(e);hist.push(i);dir=1;step(nextIdx(i))};
+ const back=()=>{dir=-1;step(hist.pop())};
+ show(h('section',{class:'step'},
+  heading('h2',t(q.body),q.mandatory),
+  t(q.description)&&h('p',{class:'qsub'},t(q.description)),
+  control(q,s,next,say),errEl,
+  h('div',{class:'nav'},hist.length?h('button',{class:'btn ghost',onclick:back},'Atrás'):h('span'),
+   h('button',{class:'btn',onclick:next},last?'Finalizar':'Siguiente'))),L.indexOf(q)/(L.length+1),q.question_type==='title_and_description'?'':`Pregunta ${O.indexOf(q)+1} de ${O.length}`)}
+
+function control(q,s,enter,say){const y=q.question_type,mc=q.max_characters>0?q.max_characters:null,mx=q.max_choices>0?q.max_choices:null;
+ if(y==='title_and_description')return null;
+ if(y==='short_response')return h('input',{class:'fld',type:'text',maxlength:mc,value:s.text,oninput:e=>s.text=e.target.value,onkeydown:e=>e.key==='Enter'&&enter()});
+ if(y==='long_response'){const c=h('p',{class:'char-count'},''),upd=()=>c.textContent=mc?`${s.text.length} / ${mc}`:'';upd();
+  return h('div',{},h('textarea',{class:'fld',rows:5,maxlength:mc,oninput:e=>{s.text=e.target.value;upd()}},s.text),c)}
+ if(y==='single_option'||y==='multiple_option'){const multi=y==='multiple_option',syncs=[];
+  return h('div',{class:'opts'},opts(q).map(o=>{
+   const inp=h('input',{type:multi?'checkbox':'radio',name:q.key,onchange:()=>{
+     if(multi){if(inp.checked){if(mx&&s.sel.length>=mx){inp.checked=false;return say(`Máximo ${mx} opciones.`)}s.sel.push(o.key)}else s.sel=s.sel.filter(k=>k!==o.key)}else s.sel=[o.key];
+     say('');syncs.forEach(f=>f())}});
+   inp.checked=s.sel.includes(o.key);
+   const ft=o.free_text&&h('input',{class:'fld',type:'text',placeholder:'Escribe aquí',maxlength:mc,value:s.free[o.key]||'',oninput:e=>s.free[o.key]=e.target.value});
+   if(ft)syncs.push(()=>ft.hidden=!s.sel.includes(o.key)),ft.hidden=!inp.checked;
+   return h('label',{class:'opt'},inp,h('span',{class:'txt'},t(o.body)),h('span',{class:'mark'+(multi?' sq':'')}),ft)}))}
+ if(y==='sorting'){s.rank=s.rank||opts(q).map(o=>o.key);const ul=h('ul',{class:'sortable'});
+  const mv=(n,d)=>{[s.rank[n],s.rank[n+d]]=[s.rank[n+d],s.rank[n]];draw()};
+  const mini=(tx,lb,on,fn)=>h('button',{class:'sbtn','aria-label':lb,disabled:!on,onclick:fn},tx);
+  const draw=()=>ul.replaceChildren(...s.rank.map((k,n)=>h('li',{},h('b',{class:'sort-idx'},n+1),h('span',{class:'sort-label'},t(findO(q,k).body)),h('span',{class:'sort-btns'},mini('▲','Subir',n>0,()=>mv(n,-1)),mini('▼','Bajar',n<s.rank.length-1,()=>mv(n,1))))));
+  draw();return ul}
+ if(/matrix/.test(y)){const multi=y==='matrix_multiple';
+  return h('div',{class:'scroll'},h('table',{},h('thead',{},h('tr',{},h('td'),opts(q).map(o=>h('th',{scope:'col'},t(o.body))))),
+   h('tbody',{},rows(q).map(r=>h('tr',{},h('th',{scope:'row'},t(r.body)),opts(q).map(o=>{
+    const inp=h('input',{type:multi?'checkbox':'radio',name:q.key+'_'+r.key,'aria-label':`${t(r.body)}: ${t(o.body)}`,onchange:()=>{
+     const a=s.rows[r.key]||[];
+     if(multi){if(inp.checked){if(mx&&a.length>=mx){inp.checked=false;return say(`Máximo ${mx} opciones por fila.`)}s.rows[r.key]=[...a,o.key]}else s.rows[r.key]=a.filter(k=>k!==o.key)}else s.rows[r.key]=[o.key];say('')}});
+    inp.checked=(s.rows[r.key]||[]).includes(o.key);return h('td',{},inp)}))))))}
+ if(y==='files'){const box=h('div'),draw=()=>box.replaceChildren(...s.files.map((f,n)=>h('p',{},f.filename+' ',h('button',{class:'btn ghost mini',onclick:()=>{s.files.splice(n,1);draw()}},'Quitar'))));
+  const inp=h('input',{type:'file',multiple:true,class:'fld',onchange:async()=>{for(const f of inp.files){if(f.size>2e6){say(`«${f.name}» supera los 2 MB.`);continue}
+    const b=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(f)});
+    s.files.push({filename:f.name,content_type:f.type||'application/octet-stream',title:f.name,base64:b})}inp.value='';draw()}});
+  draw();return h('div',{},inp,box)}
+ return null}
+
+/* ---------- Exportación (decidim.survey.responses) ---------- */
+function answer(q){const s=A[q.key],y=q.question_type,sel=k=>{const o=findO(q,k),f=(s.free[k]||'').trim();return {option:o.uuid,...(o&&o.free_text&&f?{free_text:f}:{})}};
+ const base={question:q.uuid,type:y};
+ if(/short|long/.test(y))return s.text.trim()?{...base,body:s.text}:null;
+ if(y==='single_option')return s.sel.length?{...base,selection:sel(s.sel[0])}:null;
+ if(y==='multiple_option')return s.sel.length?{...base,selections:s.sel.map(sel)}:null;
+ if(y==='sorting')return s.rank?{...base,ranking:s.rank.map(k=>findO(q,k).uuid)}:null;
+ if(y==='files')return s.files.length?{...base,files:s.files}:null;
+ const rs=rows(q).filter(r=>(s.rows[r.key]||[]).length);if(!rs.length)return null;
+ return y==='matrix_single'?{...base,rows:rs.map(r=>({row:r.uuid,selection:sel(s.rows[r.key][0])}))}
+  :{...base,rows:rs.map(r=>({row:r.uuid,selections:s.rows[r.key].map(sel)}))}}
+function build(){const rnd=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+ const answers=qs.filter(q=>!info(q)&&A[q.key]&&vis(q)).map(answer).filter(Boolean),now=new Date().toISOString();
+ return {format:'decidim.survey.responses',version:1,exported_at:now,target:{survey_uuid:S.uuid},
+  options:{on_existing:'skip',validation:'strict'},
+  submissions:[{external_id:'offline-'+rnd,respondent:{kind:'anonymous'},submitted_at:now,locale:loc,answers}]}}
+
+const val=q=>{const s=A[q.key],y=q.question_type,ob=k=>t(findO(q,k).body);
+ if(y==='sorting')return s.rank.map(ob).join(' › ');
+ if(y==='files')return s.files.map(f=>f.filename).join(', ');
+ if(/matrix/.test(y))return rows(q).filter(r=>(s.rows[r.key]||[]).length).map(r=>t(r.body)+': '+s.rows[r.key].map(ob).join(', ')).join(' · ');
+ if(/short|long/.test(y))return s.text.trim();
+ return s.sel.map(k=>ob(k)+(s.free[k]?` (${s.free[k]})`:'')).join(', ')};
+const ICON='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+function done(){const data=build(),json=JSON.stringify(data,null,2);let copied=false;
+ const status=h('div',{class:'copied-note',role:'status','aria-live':'polite'});
+ const ta=h('textarea',{class:'fld json',readonly:true,'aria-label':'JSON de respuestas'},json);
+ const det=h('details',{class:'tos-box'},h('summary',{},'Ver el contenido'),ta);
+ const lbl=h('span',{},'Copiar respuestas'),ic=h('span');ic.innerHTML=ICON;
+ const btn=h('button',{class:'btn big',onclick:copy},ic,lbl);
+ const say=(cls,...ps)=>{status.className='copied-note show '+cls;status.replaceChildren(...ps.map(p=>h('p',{},p)))};
+ async function copy(){let ok=false;try{await navigator.clipboard.writeText(json);ok=true}catch(e){ta.select();try{ok=document.execCommand('copy')}catch(_){}}
+  if(ok){copied=true;toast('✓ Copiado al portapapeles');btn.classList.add('ok');lbl.textContent='¡Copiado!';
+   say('good','✓ Respuestas copiadas al portapapeles.','Todavía no se han enviado: pega este contenido en un correo o mensaje (o guárdalo como archivo .json) y envíaselo a la persona administradora de la encuesta. Ella se encargará de importarlo.');
+   setTimeout(()=>lbl.textContent='Copiar de nuevo',3000)}
+  else{det.open=true;ta.focus();ta.select();say('warn','No se pudo copiar automáticamente.','El texto de abajo ya está seleccionado: cópialo con Ctrl+C (⌘+C en Mac) y envíalo a la persona administradora de la encuesta.')}}
+ const dl=h('button',{class:'btn link',onclick:()=>{const a=h('a',{href:URL.createObjectURL(new Blob([json],{type:'application/json'})),download:'respuestas-encuesta.json'});a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)}},'Descargar como archivo');
+ const summary=h('div',{class:'summary'},qs.filter(q=>!info(q)&&A[q.key]&&vis(q)&&answer(q)).map(q=>h('div',{class:'row'},h('span',{class:'k'},t(q.body)),h('span',{class:'v'},val(q)))));
+ window.onbeforeunload=e=>{if(!copied){e.preventDefault();e.returnValue=''}};
+ show(h('section',{class:'step done'},
+  h('div',{class:'check-big'},'✓'),
+  heading('h2','¡Gracias! Has terminado'),
+  h('p',{class:'qsub'},'Tus respuestas están en este dispositivo y aún no se han enviado. Para entregarlas:'),
+  h('ol',{class:'steps'},h('li',{},'Pulsa «Copiar respuestas».'),h('li',{},'Pégalas en un correo o mensaje de WhatsApp.'),h('li',{},'Envíalas a la persona administradora de la encuesta.')),
+  summary,btn,status,det,h('p',{class:'note'},'Debes enviar tus respuestas a la persona encargada.'),h('div',{class:'nav'},h('span'),dl)),1,'Completada')}
+
+const U=/^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+if(!U.test(S.uuid)||qs.some(q=>q.question_type!=='title_and_description'&&q.question_type!=='separator'&&(!U.test(q.uuid)||opts(q).some(o=>!U.test(o.uuid))||rows(q).some(r=>!U.test(r.uuid)))))return fail('La definición no incluye los UUID del servidor. Usa el JSON decidim.survey exportado desde la plataforma, sin modificar.');
+intro();
+})();
+</script>
+</body>
+</html>

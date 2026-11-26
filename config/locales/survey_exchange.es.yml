@@ -1,0 +1,39 @@
+es:
+  decidim:
+    surveys:
+      admin:
+        survey_exchanges:
+          back: Volver
+          export: Exportar (JSON)
+          import_into: Importar desde archivo
+          import_new: Importar encuesta
+          menu: Importar / exportar
+          codes:
+            invalid_file: El archivo no es una definición de encuesta válida.
+            invalid_signature: La firma de integridad no es válida; el archivo se modificó después de exportarlo.
+            questions_not_editable: Esta encuesta ya tiene respuestas y su componente está publicado, así que sus preguntas no se pueden modificar. Solo se pueden importar el título, la descripción, los términos y la configuración.
+            stale_reference: La encuesta cambió después de exportar este archivo. Vuelve a exportarla y edita el archivo nuevo.
+          edit:
+            help: Exporta la encuesta, edita el archivo JSON y vuelve a importarlo. Con el modo "replace" (por defecto) el archivo es la verdad completa; lo que no aparezca se borra.
+            locked: Esta encuesta ya tiene respuestas y su componente está publicado. Las preguntas no se pueden cambiar; solo se aplicarán el título, la descripción, los términos y la configuración.
+            title: Importar / exportar encuesta
+          errors:
+            no_file: Selecciona un archivo JSON.
+            not_json: El archivo no contiene JSON válido.
+            too_big: El archivo supera el tamaño máximo (%{size} KB).
+          form:
+            as_new: Tratar como encuesta nueva (ignorar identificadores)
+            as_new_help: Úsalo para copiar aquí una encuesta exportada de otra encuesta u otra instalación. Se borran las preguntas actuales y se crean todas las del archivo.
+            file: Archivo de encuesta (.json, formato decidim.survey)
+            help: Formato descrito en docs/survey-exchange-formats.md. Solo se importa la definición (preguntas, opciones, condiciones y configuración), nunca las respuestas.
+            submit: Importar
+          import:
+            invalid: No se importó nada. Revisa los errores.
+            questions_locked: Las preguntas no se modificaron porque la encuesta ya tiene respuestas.
+            success: 'Encuesta importada: %{created} preguntas creadas, %{updated} actualizadas y %{deleted} eliminadas.'
+            warnings:
+              one: 'Aviso: %{list}'
+              other: 'Avisos (%{count}): %{list}'
+          new:
+            help: Crea una encuesta nueva en este componente a partir de un archivo exportado (de esta u otra instalación).
+            title: Importar encuesta desde archivo

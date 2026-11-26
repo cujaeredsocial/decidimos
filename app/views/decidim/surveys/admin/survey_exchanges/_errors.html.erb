@@ -1,0 +1,12 @@
+<% if import_errors.any? %>
+  <div class="callout alert" role="alert">
+    <p><strong><%= import_errors.first %></strong></p>
+    <% if import_errors.size > 1 %>
+      <ul class="list-disc pl-6">
+        <% import_errors.drop(1).first(50).each do |message| %>
+          <li><code><%= message %></code></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>

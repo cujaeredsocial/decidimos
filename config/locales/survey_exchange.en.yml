@@ -1,0 +1,39 @@
+en:
+  decidim:
+    surveys:
+      admin:
+        survey_exchanges:
+          back: Back
+          export: Export (JSON)
+          import_into: Import from file
+          import_new: Import survey
+          menu: Import / export
+          codes:
+            invalid_file: The file is not a valid survey definition.
+            invalid_signature: The integrity signature is not valid; the file was modified after it was exported.
+            questions_not_editable: This survey already has responses and its component is published, so its questions cannot be modified. Only the title, description, terms and settings can be imported.
+            stale_reference: The survey changed after this file was exported. Export it again and edit the new file.
+          edit:
+            help: Export the survey, edit the JSON file and import it again. With "replace" mode (default) the file is the whole truth; anything missing from it is deleted.
+            locked: This survey already has responses and its component is published. Questions cannot change; only the title, description, terms and settings will be applied.
+            title: Import / export survey
+          errors:
+            no_file: Select a JSON file.
+            not_json: The file does not contain valid JSON.
+            too_big: The file exceeds the maximum size (%{size} KB).
+          form:
+            as_new: Treat as a new survey (ignore identifiers)
+            as_new_help: Use it to copy here a survey exported from another survey or installation. Current questions are deleted and all the questions of the file are created.
+            file: Survey file (.json, decidim.survey format)
+            help: Format described in docs/survey-exchange-formats.md. Only the definition is imported (questions, options, conditions and settings), never the responses.
+            submit: Import
+          import:
+            invalid: Nothing was imported. Check the errors.
+            questions_locked: Questions were not modified because the survey already has responses.
+            success: 'Survey imported: %{created} questions created, %{updated} updated and %{deleted} deleted.'
+            warnings:
+              one: 'Warning: %{list}'
+              other: 'Warnings (%{count}): %{list}'
+          new:
+            help: Create a new survey in this component from an exported file (from this or another installation).
+            title: Import survey from file

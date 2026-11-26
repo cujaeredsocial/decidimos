@@ -1,0 +1,32 @@
+// Admin styles of the application (loaded last by decidim_admin_overrides,
+// see docs: customize/styles "/admin: app/packs/stylesheets/decidim/admin/decidim_application.scss").
+
+// Resource tabs in the admin (e.g. a survey: Principal / Preguntas /
+// Respuestas / Configuración / Importar / exportar). Decidim lets the tabs
+// shrink and wrap, and on small screens the bar grows wider than the
+// viewport, which scrolls the whole page sideways. Keep every tab on one
+// line and scroll only the tab bar.
+.main-tabs-menu {
+  .main-tabs-menu__tabs {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    // room for the active tab underline (absolute, -0.10rem below the link)
+    padding-bottom: 0.25rem;
+  }
+
+  ul.tab-x-container {
+    > li {
+      flex-shrink: 0;
+    }
+
+    a,
+    .sidebar-menu__item-disabled {
+      white-space: nowrap;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+  }
+}

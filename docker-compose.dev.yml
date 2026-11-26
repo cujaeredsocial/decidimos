@@ -52,6 +52,9 @@ services:
       - --url=postgres://postgres:${DATABASE_PASSWORD:-postgres}@pg:5432/decidim_cujae_development?sslmode=disable
       - --auth-user=${DB_ADMIN_USER:-dbadmin}
       - --auth-pass=${DB_ADMIN_PASSWORD:-dbadmin}
+    ports:
+      - 8081:8081
+    restart: unless-stopped
     depends_on:
       - pg
 

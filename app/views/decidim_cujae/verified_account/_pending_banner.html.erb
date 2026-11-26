@@ -1,0 +1,20 @@
+<%# "Verify your account" call to action, shown on top of the My account pages.
+    Inline styles: new Tailwind classes would need an asset rebuild. %>
+<% if DecidimCujae::VerifiedAccount::PendingVerification.for?(current_user) %>
+  <% scope = "decidim_cujae.verified_account.banner" %>
+  <div role="alert"
+       class="flex flex-col md:flex-row md:items-center gap-4 p-4 mb-8 rounded"
+       style="border: 2px solid #f59e0b; background-color: #fef3c7;">
+    <%= icon "error-warning-line", style: "fill: #d97706; width: 2.5rem; height: 2.5rem; flex: none;" %>
+    <div class="grow">
+      <p class="h5" style="color: #92400e; font-weight: 700;"><%= t("title", scope:) %></p>
+      <p class="mt-1"><%= t("description", scope:) %></p>
+    </div>
+    <%= link_to decidim_verified_account.new_authorization_path,
+                class: "button button__sm md:button__lg flex-none",
+                style: "background-color: #f59e0b; border-color: #f59e0b; color: #451a03;" do %>
+      <span><%= t("button", scope:) %></span>
+      <%= icon "arrow-right-line", style: "fill: #451a03;" %>
+    <% end %>
+  </div>
+<% end %>

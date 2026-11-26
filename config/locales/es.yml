@@ -61,6 +61,12 @@ es:
         verify: "%{user_name} verificó la identidad de la participante %{resource_name}"
   decidim_cujae:
     verified_account:
+      banner:
+        button: Verificar ahora
+        description: Verifica tu cuenta para demostrar que eres una persona real y poder participar en todas las acciones de la plataforma.
+        title: Tu cuenta no está verificada
+      menu:
+        verify: Verifica tu cuenta
       authorizations:
         errors:
           already_used: Esta identidad de EnZona ya verifica otra cuenta.

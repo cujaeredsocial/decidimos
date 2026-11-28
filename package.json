@@ -1,9 +1,9 @@
 {
   "private": true,
   "dependencies": {
-    "@decidim/browserslist-config": "^0.31.8",
-    "@decidim/core": "^0.31.8",
-    "@decidim/webpacker": "^0.31.8",
+    "@decidim/browserslist-config": "^0.31.9",
+    "@decidim/core": "^0.31.9",
+    "@decidim/webpacker": "^0.31.9",
     "graphql": "^16.0.0"
   },
   "resolutions": {
@@ -12,10 +12,11 @@
   "packageManager": "yarn@1.22.22",
   "version": "0.1.0",
   "devDependencies": {
-    "@decidim/dev": "^0.31.8",
-    "@decidim/eslint-config": "^0.31.8",
-    "@decidim/prettier-config": "^0.31.8",
-    "@decidim/stylelint-config": "^0.31.8"
+    "@decidim/dev": "^0.31.9",
+    "@decidim/eslint-config": "^0.31.9",
+    "@decidim/prettier-config": "^0.31.9",
+    "@decidim/stylelint-config": "^0.31.9",
+    "shakapacker": "^8.3.0"
   },
   "browserslist": [
     "extends @decidim/browserslist-config"

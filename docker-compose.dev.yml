@@ -34,7 +34,7 @@ services:
       - redis-data:/data
   
   pg:
-    image: postgres
+    image: postgres:17
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}

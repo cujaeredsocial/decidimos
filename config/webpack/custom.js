@@ -1,7 +1,6 @@
 /* eslint-disable */
 const { config } = require("shakapacker");
 const { InjectManifest } = require("workbox-webpack-plugin");
-const path = require("path");
 const { EsbuildPlugin } = require("esbuild-loader");
 
 module.exports = {
@@ -90,7 +89,7 @@ module.exports = {
   entry: config.entrypoints,
   plugins: [
     new InjectManifest({
-      swSrc: path.resolve(__dirname, "../../app/packs/src/decidim/sw_noop.js"),
+      swSrc: "src/decidim/sw/sw.js",
 
       /**
        * NOTE:
